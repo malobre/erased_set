@@ -1,0 +1,11 @@
+[package]
+name = "static_type_map"
+description = "A type map that works over all types implementing `Any`"
+version = "0.1.0"
+authors = ["Maël Obréjan <mael.obrejan@protonmail.com>"]
+edition = "2018"
+license = "MIT"
+repository = "https://github.com/malobre/static_type_map"
+readme = "README.md"
+keywords = ["AnyMap", "typemap", "map"]
+include = ["src/**/*", "Cargo.toml"]
