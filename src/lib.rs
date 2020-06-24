@@ -80,7 +80,7 @@ impl StaticTypeMap {
         self.0.capacity()
     }
 
-    /// Returns `true` if the map contains no element.
+    /// Returns `true` if the map contains no instances of any type.
     ///
     /// # Examples
     ///
