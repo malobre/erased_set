@@ -1,0 +1,33 @@
+name: Publish
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Get crate version
+      run: |
+        cargo generate-lockfile
+        version="$(cargo pkgid | cut -f2 -d'#')"
+        echo "::set-env name=CRATE_VERSION::$version"
+
+    - name: Create a Release
+      uses: actions/create-release@v1.1.1
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: v${{ env.CRATE_VERSION }}
+
+    - name: Publish crate
+      run: cargo publish --token $TOKEN
+      env:
+        TOKEN: ${{ secrets.CRATES_IO_TOKEN }}

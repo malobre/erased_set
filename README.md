@@ -1,6 +1,6 @@
 `StaticTypeMap`, a type map for types that impl `Any`
 =====================================================
-![Rust Build, Test & Publish](https://github.com/malobre/static_type_map/workflows/Rust%20Build,%20Test%20&%20Publish/badge.svg)
+![Build, Test & Check Formatting](https://github.com/malobre/static_type_map/workflows/Build,%20Test%20&%20Check%20Formatting/badge.svg?branch=master)
 
 [Documentation](https://docs.rs/static_type_map/) | [Crates.io](https://crates.io/crates/static_type_map)
 
