@@ -2,32 +2,117 @@ name: Publish
 
 on:
   push:
-    branches: [ release ]
+    tags: [ v* ]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
+    outputs:
+      crate_version: ${{ steps.check_version.outputs.crate_version}}
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Get crate version
+    - name: Build
+      run: cargo build
+
+    - name: Run tests
+      run: cargo test
+
+    - name: Check formatting
+      run: cargo fmt -- --check
+
+    - name: Publish dry-run
+      run: cargo publish --dry-run
+
+    - name: Check version
+      id: check_version
+      env:
+        GIT_REF: ${{ github.ref }}
       run: |
-        cargo generate-lockfile
-        version="$(cargo pkgid | cut -f2 -d'#')"
-        echo "::set-env name=CRATE_VERSION::$version"
+        package_name="$(cargo read-manifest | jq -r .name)"
+        published_version_string="$(cargo search "$package_name" --limit=1 | grep -Po "^$package_name " | grep -Po '(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?')"
+        local_version_string="$(cargo read-manifest | jq -r .version)"
+
+        if [[ "v$local_version_string" != "$GIT_REF" ]]; then
+            echo "[ERROR] The Git tag ($GIT_REF) is different from the crate version (v$local_version_string)"
+            exit 1
+        fi
+
+        echo "::set-output name=crate_version::$local_version_string"
+
+        echo "[INFO ] Local version: $local_version_string"
+        if [[ -n "${published_version_string}" ]]; then
+            echo "[INFO ] Published version: $published_version_string"
+        else
+            echo "[INFO ] No published version were found, skipping version validation"
+            exit 0
+        fi
+
+        IFS=".-" read -ra published_version <<< "$published_version_string"
+        IFS=".-" read -ra local_version <<< "$local_version_string"
+
+        if [[ "$published_version_string" == "$local_version_string" ]]; then
+            echo "[ERROR] The published crate has the same version as the current build"
+            exit 2
+        # Check major version
+        elif (( published_version[0] > local_version[0] )); then
+            echo "[ERROR] The published crate has a greater major version than the current build"
+            exit 3
+        elif (( published_version[0] == local_version[0] )); then
+            # Check minor version
+            if (( published_version[1] > local_version[1] )); then
+                echo "[ERROR] The published crate has a greater minor version than the current build"
+                exit 4
+            elif (( published_version[1] == local_version[1] )); then
+                # Check patch version
+                if (( published_version[2] > local_version[2] )); then
+                    echo "[ERROR] The published crate has a greater patch version than the current build"
+                    exit 5
+                elif (( published_version[2] == local_version[2] )); then
+                    # Check pre-release version
+                    if (( ${#published_version[@]} == 3 )) && (( ${#local_version[@]} > 3 )); then
+                        echo "[ERROR] The published crate has no pre-release version which takes precedence over our version which has a pre-release version"
+                        exit 6
+                    elif (( ${#published_version[@]} > 3 )) && (( ${#local_version[@]} > 3 )); then
+                        for (( index=0;; index++ )); do
+                            if [[ "${published_version[3 + index]}" =~ ^[a-zA-Z] ]]; then
+                                if [[ "${local_version[3 + index]}" =~ ^[0-9]+$ ]]; then
+                                    echo "The published crate has a non-numeric pre-release version which takes precedence over our numeric pre-release"
+                                    exit 7
+                                elif [[ "${local_version[3 + index]}" =~ ^[a-zA-Z] ]]; then
+                                greater_version=$(echo "${published_version[3 + index]}" "${local_version[3 + index]}" | tr "[:blank:]" "\n" | sort --reverse --general-numeric-sort | head --lines=1)
+                                    if [[ "$greater_version" == "${published_version[3 + index]}" ]]; then
+                                        echo "The published crate has a non-numeric pre-release which is greater than our local non-numeric pre-release"
+                                        exit 8
+                                    fi
+                                fi
+                            fi
+                        done
+                    fi
+                fi
+            fi
+        fi
+
+  publish:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v2
 
     - name: Create a Release
       uses: actions/create-release@v1.1.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: v${{ env.CRATE_VERSION }}
+        tag_name: v${{ needs.build.outputs.crate_version }}
+        release_name: v${{ needs.build.outputs.crate_version }}
 
     - name: Publish crate
       run: cargo publish --token $TOKEN
