@@ -140,7 +140,7 @@ impl StaticTypeMap {
         self.0.contains_key(&TypeId::of::<T>())
     }
 
-    /// Returns a reference to the instance of `T`.
+    /// Returns a reference to an instance of `T`.
     ///
     /// If the map does not have an instance of `T`, [`None`] is returned.
     ///
@@ -162,7 +162,7 @@ impl StaticTypeMap {
             .and_then(|any| any.downcast_ref())
     }
 
-    /// Returns a mutable reference to the instance of `T`.
+    /// Returns a mutable reference to an instance of `T`.
     ///
     /// If the map does not have an instance of `T`, [`None`] is returned.
     ///
@@ -208,7 +208,7 @@ impl StaticTypeMap {
             .map(|concrete_type| *concrete_type)
     }
 
-    /// Remove and return the instance of type `T` from the map.
+    /// Remove and return an instance of type `T` from the map.
     ///
     /// If the map did not have this type present, [`None`] is returned.
     ///
@@ -224,7 +224,8 @@ impl StaticTypeMap {
     where
         T: Any,
     {
-        self.0.remove(&TypeId::of::<T>())
+        self.0
+            .remove(&TypeId::of::<T>())
             .and_then(|any| any.downcast().ok())
             .map(|concrete_type| *concrete_type)
     }
