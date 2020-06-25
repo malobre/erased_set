@@ -1,4 +1,4 @@
-name: Rust
+name: Rust Build, Test & Publish
 
 on:
   push:
@@ -23,7 +23,9 @@ jobs:
     - name: Create a Release
       uses: actions/create-release@v1.1.1
       with:
-        tag_name: ${{ GITHUB_REF }}
-        release_name: ${{ CRATE_VERSION }}
+        tag_name: ${{ github.ref }}
+        release_name: ${{ env.CRATE_VERSION }}
     - name: Publish crate
-      run: cargo publish --token ${{ CRATES_IO_TOKEN }}
+      run: cargo publish --token $TOKEN
+      env:
+        TOKEN: ${{ secrets.CRATES_IO_TOKEN }}

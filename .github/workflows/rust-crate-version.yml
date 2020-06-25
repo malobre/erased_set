@@ -1,0 +1,12 @@
+name: Rust Version Check
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check if local version is different from published version
+      run: local_version="$(cargo pkgid | cut -f2 -d'#')"; published_version="$(cargo pkgid static_type_map | cut -f2 -d'#')"; [ ! $local_version = $published_version ] && echo "::set_env name=CRATE_VERSION::$local_version"
