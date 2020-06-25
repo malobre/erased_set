@@ -1,0 +1,31 @@
+name: Check Crate Version
+
+on:
+  pull_request:
+    branch: release
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check-version:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Generate lockfile
+      run: cargo generate-lockfile
+
+    - name: Get latest published version
+      run: |
+        published_version=$(cargo search static_type_map --limit 1 | grep -Po '(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?')
+        echo "::set-env name=PUBLISHED_VERSION::$published_version"
+
+    - name: Compare versions
+      env:
+        PUBLISHED_VERSION: ${{ env.PUBLISHED_VERSION }}
+      run: |
+        local_version="$(cargo pkgid | cut -f2 -d'#')"
+        [ ! $local_version = $PUBLISHED_VERSION ]

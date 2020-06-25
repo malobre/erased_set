@@ -1,10 +1,10 @@
-name: Rust
+name: Build, Test & Check Formatting
 
 on:
   push:
-    branches: [ development ]
+    branch: master
   pull_request:
-    branches: [ development ]
+    branch: master
 
 env:
   CARGO_TERM_COLOR: always
@@ -16,7 +16,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Build
-      run: cargo build --verbose
+      run: cargo build
+
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test
+
+    - name: Check formatting
+      run: cargo fmt -- --check
