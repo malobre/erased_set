@@ -4,8 +4,8 @@
 
 [Documentation](https://docs.rs/static_type_map/) | [Crates.io](https://crates.io/crates/static_type_map)
 
-This crates provides a `StaticTypeMap` which is a wrapper over `HashMap<TypeId, Box<dyn Any>>`.
-It allows you to store a single instance of all types that implement [`Any`](https://doc.rust-lang.org/std/any/trait.Any.html).
+This crates provides a [`StaticTypeMap`](https://docs.rs/static_type_map/latest/static_type_map/struct.StaticTypeMap.html) which allows you to store a single instance of all types that implement [`Any`](https://doc.rust-lang.org/std/any/trait.Any.html).
+The crate is `no_std` compatible using the `no_std` feature.
 
 ## Example
 ```rust
