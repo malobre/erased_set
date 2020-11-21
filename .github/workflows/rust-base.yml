@@ -16,11 +16,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Build
-      run: cargo build
+    - name: Build without default features
+      run: cargo build --no-default-features
 
-    - name: Run tests
-      run: cargo test
+    - name: Build with all features
+      run: cargo build --all-features
+
+    - name: Run tests without default features
+      run: cargo test --no-default-features
+      
+    - name: Run tests with all features
+      run: cargo test --all-features
 
     - name: Check formatting
       run: cargo fmt -- --check
