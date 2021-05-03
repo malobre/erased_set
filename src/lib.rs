@@ -201,6 +201,23 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     pub fn shrink_to_fit(&mut self) {
         self.0.shrink_to_fit()
     }
+
+    /// Returns `true` if the map contains an instance of `T`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ::static_type_map::StaticTypeMap;
+    /// let mut type_map = StaticTypeMap::new();
+    /// type_map.insert("a");
+    /// assert!(type_map.contains::<&str>());
+    /// ```
+    pub fn contains<T>(&self) -> bool
+    where
+        T: Any,
+    {
+        self.0.contains_key(&TypeId::of::<T>())
+    }
 }
 
 impl<A: 'static + ?Sized + Any> Default for GenericStaticTypeMap<A> {
@@ -209,220 +226,102 @@ impl<A: 'static + ?Sized + Any> Default for GenericStaticTypeMap<A> {
     }
 }
 
-impl GenericStaticTypeMap<dyn Any> {
-    /// Returns `true` if the map contains an instance of `T`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use ::static_type_map::StaticTypeMap;
-    /// let mut type_map = StaticTypeMap::new();
-    /// type_map.insert("a");
-    /// assert!(type_map.contains::<&str>());
-    /// ```
-    pub fn contains<T>(&self) -> bool
-    where
-        T: Any,
-    {
-        self.0.contains_key(&TypeId::of::<T>())
-    }
+macro_rules! impl_bounded_map {
+    ( $( $bound:tt $(+ $others:tt )* ),* ) => {
+        $(
+            impl GenericStaticTypeMap<dyn $bound $(+ $others)* > {
+                /// Returns a reference to an instance of `T`.
+                ///
+                /// If the map does not have an instance of `T`, [`None`] is returned.
+                ///
+                /// # Examples
+                ///
+                /// ```
+                /// use ::static_type_map::StaticTypeMap;
+                /// let mut type_map = StaticTypeMap::new();
+                /// type_map.insert("a");
+                /// assert_eq!(type_map.get::<&str>(), Some(&"a"));
+                /// assert_eq!(type_map.get::<bool>(), None);
+                /// ```
+                pub fn get<T>(&self) -> Option<&T>
+                where
+                    T: $bound $(+ $others)*,
+                {
+                    self.0
+                        .get(&TypeId::of::<T>())
+                        .and_then(|any| any.downcast_ref())
+                }
 
-    /// Returns a reference to an instance of `T`.
-    ///
-    /// If the map does not have an instance of `T`, [`None`] is returned.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use ::static_type_map::StaticTypeMap;
-    /// let mut type_map = StaticTypeMap::new();
-    /// type_map.insert("a");
-    /// assert_eq!(type_map.get::<&str>(), Some(&"a"));
-    /// assert_eq!(type_map.get::<bool>(), None);
-    /// ```
-    pub fn get<T>(&self) -> Option<&T>
-    where
-        T: Any,
-    {
-        self.0
-            .get(&TypeId::of::<T>())
-            .and_then(|any| any.downcast_ref())
-    }
+                /// Returns a mutable reference to an instance of `T`.
+                ///
+                /// If the map does not have an instance of `T`, [`None`] is returned.
+                ///
+                /// # Examples
+                ///
+                /// ```
+                /// use ::static_type_map::StaticTypeMap;
+                /// let mut type_map = StaticTypeMap::new();
+                /// type_map.insert("a");
+                /// if let Some(x) = type_map.get_mut::<&str>() {
+                ///     *x = "b";
+                /// }
+                /// assert_eq!(type_map.get::<&str>(), Some(&"b"));
+                /// ```
+                pub fn get_mut<T>(&mut self) -> Option<&mut T>
+                where
+                    T: $bound $(+ $others)*,
+                {
+                    self.0
+                        .get_mut(&TypeId::of::<T>())
+                        .and_then(|any| any.downcast_mut())
+                }
 
-    /// Returns a mutable reference to an instance of `T`.
-    ///
-    /// If the map does not have an instance of `T`, [`None`] is returned.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use ::static_type_map::StaticTypeMap;
-    /// let mut type_map = StaticTypeMap::new();
-    /// type_map.insert("a");
-    /// if let Some(x) = type_map.get_mut::<&str>() {
-    ///     *x = "b";
-    /// }
-    /// assert_eq!(type_map.get::<&str>(), Some(&"b"));
-    /// ```
-    pub fn get_mut<T>(&mut self) -> Option<&mut T>
-    where
-        T: Any,
-    {
-        self.0
-            .get_mut(&TypeId::of::<T>())
-            .and_then(|any| any.downcast_mut())
-    }
+                /// Insert an instance of type `T` into the map.
+                ///
+                /// If the map did not have this type present, [`None`] is returned.
+                ///
+                /// # Examples
+                ///
+                /// ```
+                /// use ::static_type_map::StaticTypeMap;
+                /// let mut type_map = StaticTypeMap::new();
+                /// assert_eq!(type_map.insert("a"), None);
+                /// assert_eq!(type_map.insert("b"), Some("a"));
+                /// ```
+                pub fn insert<T>(&mut self, t: T) -> Option<T>
+                where
+                    T: $bound $(+ $others)*,
+                {
+                    self.0
+                        .insert(TypeId::of::<T>(), Box::new(t))
+                        .and_then(|any| any.downcast().ok())
+                        .map(|concrete_type| *concrete_type)
+                }
 
-    /// Insert an instance of type `T` into the map.
-    ///
-    /// If the map did not have this type present, [`None`] is returned.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use ::static_type_map::StaticTypeMap;
-    /// let mut type_map = StaticTypeMap::new();
-    /// assert_eq!(type_map.insert("a"), None);
-    /// assert_eq!(type_map.insert("b"), Some("a"));
-    /// ```
-    pub fn insert<T>(&mut self, t: T) -> Option<T>
-    where
-        T: Any,
-    {
-        self.0
-            .insert(TypeId::of::<T>(), Box::new(t))
-            .and_then(|any| any.downcast().ok())
-            .map(|concrete_type| *concrete_type)
-    }
-
-    /// Remove and return an instance of type `T` from the map.
-    ///
-    /// If the map did not have this type present, [`None`] is returned.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use ::static_type_map::StaticTypeMap;
-    /// let mut type_map = StaticTypeMap::new();
-    /// type_map.insert("a");
-    /// assert_eq!(type_map.remove::<&str>(), Some("a"));
-    /// ```
-    pub fn remove<T>(&mut self) -> Option<T>
-    where
-        T: Any,
-    {
-        self.0
-            .remove(&TypeId::of::<T>())
-            .and_then(|any| any.downcast().ok())
-            .map(|concrete_type| *concrete_type)
+                /// Remove and return an instance of type `T` from the map.
+                ///
+                /// If the map did not have this type present, [`None`] is returned.
+                ///
+                /// # Examples
+                ///
+                /// ```
+                /// use ::static_type_map::StaticTypeMap;
+                /// let mut type_map = StaticTypeMap::new();
+                /// type_map.insert("a");
+                /// assert_eq!(type_map.remove::<&str>(), Some("a"));
+                /// ```
+                pub fn remove<T>(&mut self) -> Option<T>
+                where
+                    T: $bound $(+ $others)*,
+                {
+                    self.0
+                        .remove(&TypeId::of::<T>())
+                        .and_then(|any| any.downcast().ok())
+                        .map(|concrete_type| *concrete_type)
+                }
+            }
+        )*
     }
 }
 
-impl GenericStaticTypeMap<dyn Any + Send> {
-    /// Returns `true` if the map contains an instance of `T`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use ::static_type_map::SendStaticTypeMap;
-    /// let mut type_map = SendStaticTypeMap::new();
-    /// type_map.insert("a");
-    /// assert!(type_map.contains::<&str>());
-    /// ```
-    pub fn contains<T>(&self) -> bool
-    where
-        T: Any + Send,
-    {
-        self.0.contains_key(&TypeId::of::<T>())
-    }
-
-    /// Returns a reference to an instance of `T`.
-    ///
-    /// If the map does not have an instance of `T`, [`None`] is returned.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use ::static_type_map::SendStaticTypeMap;
-    /// let mut type_map = SendStaticTypeMap::new();
-    /// type_map.insert("a");
-    /// assert_eq!(type_map.get::<&str>(), Some(&"a"));
-    /// assert_eq!(type_map.get::<bool>(), None);
-    /// ```
-    pub fn get<T>(&self) -> Option<&T>
-    where
-        T: Any + Send,
-    {
-        self.0
-            .get(&TypeId::of::<T>())
-            .and_then(|any| any.downcast_ref())
-    }
-
-    /// Returns a mutable reference to an instance of `T`.
-    ///
-    /// If the map does not have an instance of `T`, [`None`] is returned.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use ::static_type_map::SendStaticTypeMap;
-    /// let mut type_map = SendStaticTypeMap::new();
-    /// type_map.insert("a");
-    /// if let Some(x) = type_map.get_mut::<&str>() {
-    ///     *x = "b";
-    /// }
-    /// assert_eq!(type_map.get::<&str>(), Some(&"b"));
-    /// ```
-    pub fn get_mut<T>(&mut self) -> Option<&mut T>
-    where
-        T: Any + Send,
-    {
-        self.0
-            .get_mut(&TypeId::of::<T>())
-            .and_then(|any| any.downcast_mut())
-    }
-
-    /// Insert an instance of type `T` into the map.
-    ///
-    /// If the map did not have this type present, [`None`] is returned.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use ::static_type_map::SendStaticTypeMap;
-    /// let mut type_map = SendStaticTypeMap::new();
-    /// assert_eq!(type_map.insert("a"), None);
-    /// assert_eq!(type_map.insert("b"), Some("a"));
-    /// ```
-    pub fn insert<T>(&mut self, t: T) -> Option<T>
-    where
-        T: Any + Send,
-    {
-        self.0
-            .insert(TypeId::of::<T>(), Box::new(t))
-            .and_then(|any| any.downcast().ok())
-            .map(|concrete_type| *concrete_type)
-    }
-
-    /// Remove and return an instance of type `T` from the map.
-    ///
-    /// If the map did not have this type present, [`None`] is returned.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use ::static_type_map::SendStaticTypeMap;
-    /// let mut type_map = SendStaticTypeMap::new();
-    /// type_map.insert("a");
-    /// assert_eq!(type_map.remove::<&str>(), Some("a"));
-    /// ```
-    pub fn remove<T>(&mut self) -> Option<T>
-    where
-        T: Any + Send,
-    {
-        self.0
-            .remove(&TypeId::of::<T>())
-            .and_then(|any| any.downcast().ok())
-            .map(|concrete_type| *concrete_type)
-    }
-}
+impl_bounded_map!(Any, Any + Send);
