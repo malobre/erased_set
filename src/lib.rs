@@ -70,6 +70,32 @@ pub type StaticTypeMap = GenericStaticTypeMap<dyn Any>;
 /// ```
 pub type SendStaticTypeMap = GenericStaticTypeMap<dyn Any + Send>;
 
+/// A wrapper over `HashMap<TypeId, Box<dyn Any + SendSync>>`.
+///
+/// # Examples
+///
+/// ```
+/// use ::static_type_map::SendSyncStaticTypeMap;
+/// let mut type_map = SendSyncStaticTypeMap::new();
+/// type_map.insert(10u8);
+/// type_map.insert(20u16);
+/// type_map.insert(true);
+/// type_map.insert("a");
+///
+/// if type_map.contains::<&str>() {
+///     println!("We have an `&str` stored, its value is: {}.", type_map.get::<&str>().unwrap());
+/// }
+///
+/// if let Some(previous_value) = type_map.insert(50u8) {
+///     println!("We had a `u8` before inserting a new one, its value was {}.", previous_value);
+/// }
+///
+/// type_map.remove::<bool>();
+///
+/// println!("Our `SendSyncStaticTypeMap` contains {} types.", type_map.len());
+/// ```
+pub type SendSyncStaticTypeMap = GenericStaticTypeMap<dyn Any + Send + Sync>;
+
 /// Generic wrapper over `HashMap<TypeId, Box<A>>`, used to define `StaticTypeMap` and `SendStaticTypeMap`.
 pub struct GenericStaticTypeMap<A: 'static + ?Sized + Any>(HashMap<TypeId, Box<A>>);
 
@@ -249,7 +275,7 @@ macro_rules! impl_bounded_map {
                 {
                     self.0
                         .get(&TypeId::of::<T>())
-                        .and_then(|any| any.downcast_ref())
+                        .and_then(|any| (&**any as &(dyn Any)).downcast_ref())
                 }
 
                 /// Returns a mutable reference to an instance of `T`.
@@ -273,7 +299,7 @@ macro_rules! impl_bounded_map {
                 {
                     self.0
                         .get_mut(&TypeId::of::<T>())
-                        .and_then(|any| any.downcast_mut())
+                        .and_then(|any| (&mut **any as &mut (dyn Any)).downcast_mut())
                 }
 
                 /// Insert an instance of type `T` into the map.
@@ -294,7 +320,7 @@ macro_rules! impl_bounded_map {
                 {
                     self.0
                         .insert(TypeId::of::<T>(), Box::new(t))
-                        .and_then(|any| any.downcast().ok())
+                        .and_then(|any| (any as Box<dyn Any>).downcast().ok())
                         .map(|concrete_type| *concrete_type)
                 }
 
@@ -316,7 +342,7 @@ macro_rules! impl_bounded_map {
                 {
                     self.0
                         .remove(&TypeId::of::<T>())
-                        .and_then(|any| any.downcast().ok())
+                        .and_then(|any| (any as Box<dyn Any>).downcast().ok())
                         .map(|concrete_type| *concrete_type)
                 }
             }
@@ -324,4 +350,4 @@ macro_rules! impl_bounded_map {
     }
 }
 
-impl_bounded_map!(Any, Any + Send);
+impl_bounded_map!(Any, Any + Send, Any + Send + Sync);
