@@ -66,7 +66,7 @@ pub type StaticTypeMap = GenericStaticTypeMap<dyn Any>;
 ///
 /// type_map.remove::<bool>();
 ///
-/// println!("Our `StaticTypeMap` contains {} types.", type_map.len());
+/// println!("Our `SendStaticTypeMap` contains {} types.", type_map.len());
 /// ```
 pub type SendStaticTypeMap = GenericStaticTypeMap<dyn Any + Send>;
 
