@@ -70,7 +70,7 @@ pub type StaticTypeMap = GenericStaticTypeMap<dyn Any>;
 /// ```
 pub type SendStaticTypeMap = GenericStaticTypeMap<dyn Any + Send>;
 
-/// A wrapper over `HashMap<TypeId, Box<dyn Any + SendSync>>`.
+/// A wrapper over `HashMap<TypeId, Box<dyn Any + Send + Sync>>`.
 ///
 /// # Examples
 ///
