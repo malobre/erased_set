@@ -1,6 +1,5 @@
-//! This crate provides a `StaticTypeMap` which allows you to store a single instance of any type
+//! This crate provides a [`StaticTypeMap`] which allows you to store a single instance of any type
 //! that implement [`Any`]
-//!
 
 #![cfg_attr(feature = "no_std", no_std)]
 
@@ -96,11 +95,11 @@ pub type SendStaticTypeMap = GenericStaticTypeMap<dyn Any + Send>;
 /// ```
 pub type SendSyncStaticTypeMap = GenericStaticTypeMap<dyn Any + Send + Sync>;
 
-/// Generic wrapper over `HashMap<TypeId, Box<A>>`, used to define `StaticTypeMap` and `SendStaticTypeMap`.
+/// Generic wrapper over `HashMap<TypeId, Box<A>>`, used to define [`StaticTypeMap`], [`SendStaticTypeMap`] and [`SendSyncStaticTypeMap`].
 pub struct GenericStaticTypeMap<A: 'static + ?Sized + Any>(HashMap<TypeId, Box<A>>);
 
 impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
-    /// Creates an empty `StaticTypeMap`
+    /// Creates an empty [`StaticTypeMap`]
     ///
     /// The static type map is initially created with a capacity of 0, so it will not allocate
     /// until it is first inserted into.
@@ -117,7 +116,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
         }
     }
 
-    /// Creates an empty `StaticTypeMap`
+    /// Creates an empty [`StaticTypeMap`]
     ///
     /// The static type map will be able to hold at least `capacity` types without reallocating.
     /// If `capacity` is 0, the static type map will not allocate.
@@ -134,7 +133,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
 
     /// Returns the number of types the map can hold without reallocating.
     ///
-    /// This number is a lower bound; the `StaticTypeMap` might be able to hold more, but it is
+    /// This number is a lower bound; the [`StaticTypeMap`] might be able to hold more, but it is
     /// guaranteed to be able to hold at least so many.
     ///
     /// # Examples
