@@ -1,5 +1,5 @@
-//! This crate provides a [`StaticTypeMap`] which allows you to store a single instance of any type
-//! that implement [`Any`].
+//! This crate provides a [`StaticTypeMap`] which allows you to store a single instance of any
+//! `'static` value as long as it implements [`Any`].
 //!
 //! # Examples
 //!
