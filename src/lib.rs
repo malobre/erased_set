@@ -1,6 +1,8 @@
 //! This crate provides a [`StaticTypeMap`] which allows you to store a single instance of any type
 //! that implement [`Any`]
 
+#![forbid(unsafe_code)]
+
 #![cfg_attr(feature = "no_std", no_std)]
 
 #[cfg(feature = "no_std")]
