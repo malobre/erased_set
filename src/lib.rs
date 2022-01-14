@@ -2,7 +2,6 @@
 //! that implement [`Any`]
 
 #![forbid(unsafe_code)]
-
 #![cfg_attr(feature = "no_std", no_std)]
 
 #[cfg(feature = "no_std")]
@@ -112,9 +111,10 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// use ::static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::new();
     /// ```
+    #[must_use]
     pub fn new() -> Self {
         Self {
-            ..Default::default()
+            ..Self::default()
         }
     }
 
@@ -129,6 +129,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// use ::static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::with_capacity(10);
     /// ```
+    #[must_use]
     pub fn with_capacity(capacity: usize) -> Self {
         Self(HashMap::with_capacity(capacity))
     }
@@ -145,6 +146,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// let mut type_map = StaticTypeMap::with_capacity(100);
     /// assert!(type_map.capacity() >= 100);
     /// ```
+    #[must_use]
     pub fn capacity(&self) -> usize {
         self.0.capacity()
     }
@@ -158,6 +160,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// let mut type_map = StaticTypeMap::new();
     /// assert!(type_map.is_empty());
     /// ```
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
@@ -173,6 +176,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// type_map.insert("a");
     /// assert_eq!(type_map.len(), 1);
     /// ```
+    #[must_use]
     pub fn len(&self) -> usize {
         self.0.len()
     }
@@ -208,7 +212,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// assert!(type_map.capacity() >= 10);
     /// ```
     pub fn reserve(&mut self, additional: usize) {
-        self.0.reserve(additional)
+        self.0.reserve(additional);
     }
 
     /// Shrinks the capacity of the map as much as possible. It will drop down as much as possible
@@ -226,7 +230,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// assert!(type_map.capacity() >= 2);
     /// ```
     pub fn shrink_to_fit(&mut self) {
-        self.0.shrink_to_fit()
+        self.0.shrink_to_fit();
     }
 
     /// Returns `true` if the map contains an instance of `T`.
@@ -239,6 +243,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// type_map.insert("a");
     /// assert!(type_map.contains::<&str>());
     /// ```
+    #[must_use]
     pub fn contains<T>(&self) -> bool
     where
         T: Any,
@@ -270,6 +275,7 @@ macro_rules! impl_bounded_map {
                 /// assert_eq!(type_map.get::<&str>(), Some(&"a"));
                 /// assert_eq!(type_map.get::<bool>(), None);
                 /// ```
+                #[must_use]
                 pub fn get<T>(&self) -> Option<&T>
                 where
                     T: $bound $(+ $others)*,
@@ -294,6 +300,7 @@ macro_rules! impl_bounded_map {
                 /// }
                 /// assert_eq!(type_map.get::<&str>(), Some(&"b"));
                 /// ```
+                #[must_use]
                 pub fn get_mut<T>(&mut self) -> Option<&mut T>
                 where
                     T: $bound $(+ $others)*,
