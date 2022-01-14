@@ -15,4 +15,7 @@ include = ["src/**/*", "Cargo.toml", "LICENSE"]
 hashbrown = { version = "0.11", optional = true }
 
 [features]
+default = ["send", "sync"]
+send = []
+sync = []
 no_std = ["hashbrown"]

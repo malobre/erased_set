@@ -298,12 +298,14 @@ macro_rules! define_bounded_map {
 
 define_bounded_map!(StaticTypeMap, Any);
 
+#[cfg(feature = "send")]
 define_bounded_map!(
     /// Like [`StaticTypeMap`] but with a [`Send`] bound.
     SendStaticTypeMap,
     Any + Send
 );
 
+#[cfg(feature = "sync")]
 define_bounded_map!(
     /// Like [`StaticTypeMap`] but with a [`Send`] + [`Sync`] bound.
     SendSyncStaticTypeMap,
