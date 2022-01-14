@@ -1,16 +1,29 @@
-`StaticTypeMap`, a type map for 'static types
-=============================================
+# `StaticTypeMap`, a type map for 'static types
+
 ![Build, Test & Check Formatting](https://github.com/malobre/static_type_map/workflows/Build,%20Test%20&%20Check%20Formatting/badge.svg?branch=master)
 
-[Documentation](https://docs.rs/static_type_map/) | [Crates.io](https://crates.io/crates/static_type_map)
+[Documentation](https://docs.rs/static_type_map/) |
+[Crates.io](https://crates.io/crates/static_type_map)
 
-This crates provides a [`StaticTypeMap`](https://docs.rs/static_type_map/latest/static_type_map/struct.StaticTypeMap.html) which allows you to store a single instance of all types that implement [`Any`](https://doc.rust-lang.org/std/any/trait.Any.html).
-The crate is `no_std` compatible using the `no_std` feature, (`alloc` is required).
+This crates provides a
+[`StaticTypeMap`](https://docs.rs/static_type_map/latest/static_type_map/struct.StaticTypeMap.html)
+which allows you to store a single instance of all types that implement
+[`Any`](https://doc.rust-lang.org/std/any/trait.Any.html). The crate is `no_std`
+compatible using the `no_std` feature, (`alloc` is required).
+
+## Features
+
+| name     | default ? | description                     |
+| -------- | --------- | ------------------------------- |
+| `send`   | yes       | Enables `SendStaticTypeMap`     |
+| `sync`   | yes       | Enables `SyncSendStaticTypeMap` |
+| `no_std` | no        | Enables `no_std` support        |
 
 ## Example
+
 ```rust
-use ::static_type_map::StaticTypeMap;
-use ::some_crate::{ EventA, EventB, EventC };
+use static_type_map::StaticTypeMap;
+use some_crate::{ EventA, EventB, EventC };
 
 pub fn main() {
     let mut events = StaticTypeMap::new();
@@ -27,5 +40,4 @@ pub fn main() {
     assert_eq!(events.get::<Vec<EventB>>().len(), 1);
     assert_eq!(events.get::<Vec<EventC>>(), None);
 }
-
 ```
