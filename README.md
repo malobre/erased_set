@@ -1,4 +1,4 @@
-# `StaticTypeMap`, a type map for 'static types
+# `StaticTypeMap`, a map of types
 
 ![Build, Test & Check Formatting](https://github.com/malobre/static_type_map/workflows/Build,%20Test%20&%20Check%20Formatting/badge.svg?branch=master)
 
@@ -6,18 +6,20 @@
 [Crates.io](https://crates.io/crates/static_type_map)
 
 This crates provides a
-[`StaticTypeMap`](https://docs.rs/static_type_map/latest/static_type_map/struct.StaticTypeMap.html)
-which allows you to store a single instance of all types that implement
-[`Any`](https://doc.rust-lang.org/std/any/trait.Any.html). The crate is `no_std`
-compatible using the `no_std` feature, (`alloc` is required).
+[`StaticTypeMap`](https://docs.rs/static_type_map/0.4/static_type_map/struct.StaticTypeMap.html)
+which allows you to store a single instance of any `'static` value as long as it
+implements [`Any`](https://doc.rust-lang.org/stable/std/any/trait.Any.html).
+
+The crate is `no_std` compatible using the `no_std` feature, (`alloc` is
+required).
 
 ## Features
 
-| name     | default ? | description                     |
-| -------- | --------- | ------------------------------- |
-| `send`   | yes       | Enables `SendStaticTypeMap`     |
-| `sync`   | yes       | Enables `SyncSendStaticTypeMap` |
-| `no_std` | no        | Enables `no_std` support        |
+| name     | default ? | description                                                                                                              |
+| -------- | --------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `send`   | yes       | Enables [`SendStaticTypeMap`](https://docs.rs/static_type_map/0.4/static_type_map/struct.SendStaticTypeMap.html)         |
+| `sync`   | yes       | Enables [`SendSyncStaticTypeMap`](https://docs.rs/static_type_map/0.4/static_type_map/struct.SendSyncStaticTypeMap.html) |
+| `no_std` | no        | Enables `no_std` support                                                                                                 |
 
 ## Example
 
