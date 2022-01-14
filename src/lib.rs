@@ -1,5 +1,5 @@
 //! This crate provides a [`StaticTypeMap`] which allows you to store a single instance of any type
-//! that implement [`Any`]
+//! that implement [`Any`].
 
 #![forbid(unsafe_code)]
 #![cfg_attr(feature = "no_std", no_std)]
@@ -23,7 +23,7 @@ use core::any::{Any, TypeId};
 /// # Examples
 ///
 /// ```
-/// use ::static_type_map::StaticTypeMap;
+/// use static_type_map::StaticTypeMap;
 /// let mut type_map = StaticTypeMap::new();
 /// type_map.insert(10u8);
 /// type_map.insert(20u16);
@@ -49,7 +49,7 @@ pub type StaticTypeMap = GenericStaticTypeMap<dyn Any>;
 /// # Examples
 ///
 /// ```
-/// use ::static_type_map::SendStaticTypeMap;
+/// use static_type_map::SendStaticTypeMap;
 /// let mut type_map = SendStaticTypeMap::new();
 /// type_map.insert(10u8);
 /// type_map.insert(20u16);
@@ -75,7 +75,7 @@ pub type SendStaticTypeMap = GenericStaticTypeMap<dyn Any + Send>;
 /// # Examples
 ///
 /// ```
-/// use ::static_type_map::SendSyncStaticTypeMap;
+/// use static_type_map::SendSyncStaticTypeMap;
 /// let mut type_map = SendSyncStaticTypeMap::new();
 /// type_map.insert(10u8);
 /// type_map.insert(20u16);
@@ -96,7 +96,10 @@ pub type SendStaticTypeMap = GenericStaticTypeMap<dyn Any + Send>;
 /// ```
 pub type SendSyncStaticTypeMap = GenericStaticTypeMap<dyn Any + Send + Sync>;
 
-/// Generic wrapper over `HashMap<TypeId, Box<A>>`, used to define [`StaticTypeMap`], [`SendStaticTypeMap`] and [`SendSyncStaticTypeMap`].
+/// Generic wrapper over `HashMap<TypeId, Box<A>>`, used to define:
+/// - [`StaticTypeMap`]
+/// - [`SendStaticTypeMap`]
+/// - [`SendSyncStaticTypeMap`].
 pub struct GenericStaticTypeMap<A: 'static + ?Sized + Any>(HashMap<TypeId, Box<A>>);
 
 impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
@@ -108,7 +111,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// # Examples
     ///
     /// ```
-    /// use ::static_type_map::StaticTypeMap;
+    /// use static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::new();
     /// ```
     #[must_use]
@@ -126,7 +129,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// # Examples
     ///
     /// ```
-    /// use ::static_type_map::StaticTypeMap;
+    /// use static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::with_capacity(10);
     /// ```
     #[must_use]
@@ -142,7 +145,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// # Examples
     ///
     /// ```
-    /// use ::static_type_map::StaticTypeMap;
+    /// use static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::with_capacity(100);
     /// assert!(type_map.capacity() >= 100);
     /// ```
@@ -156,7 +159,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// # Examples
     ///
     /// ```
-    /// use ::static_type_map::StaticTypeMap;
+    /// use static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::new();
     /// assert!(type_map.is_empty());
     /// ```
@@ -170,7 +173,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// # Examples
     ///
     /// ```
-    /// use ::static_type_map::StaticTypeMap;
+    /// use static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::new();
     /// assert_eq!(type_map.len(), 0);
     /// type_map.insert("a");
@@ -186,7 +189,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// # Examples
     ///
     /// ```
-    /// use ::static_type_map::StaticTypeMap;
+    /// use static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::new();
     /// type_map.insert("a");
     /// type_map.clear();
@@ -205,7 +208,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     ///
     /// # Examples
     /// ```
-    /// use ::static_type_map::StaticTypeMap;
+    /// use static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::new();
     /// assert_eq!(type_map.capacity(), 0);
     /// type_map.reserve(10);
@@ -222,7 +225,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// # Examples
     ///
     /// ```
-    /// use ::static_type_map::StaticTypeMap;
+    /// use static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::with_capacity(100);
     /// assert!(type_map.capacity() >= 0);
     /// type_map.insert("a");
@@ -238,7 +241,7 @@ impl<A: 'static + ?Sized + Any> GenericStaticTypeMap<A> {
     /// # Examples
     ///
     /// ```
-    /// use ::static_type_map::StaticTypeMap;
+    /// use static_type_map::StaticTypeMap;
     /// let mut type_map = StaticTypeMap::new();
     /// type_map.insert("a");
     /// assert!(type_map.contains::<&str>());
@@ -269,7 +272,7 @@ macro_rules! impl_bounded_map {
                 /// # Examples
                 ///
                 /// ```
-                /// use ::static_type_map::StaticTypeMap;
+                /// use static_type_map::StaticTypeMap;
                 /// let mut type_map = StaticTypeMap::new();
                 /// type_map.insert("a");
                 /// assert_eq!(type_map.get::<&str>(), Some(&"a"));
@@ -292,7 +295,7 @@ macro_rules! impl_bounded_map {
                 /// # Examples
                 ///
                 /// ```
-                /// use ::static_type_map::StaticTypeMap;
+                /// use static_type_map::StaticTypeMap;
                 /// let mut type_map = StaticTypeMap::new();
                 /// type_map.insert("a");
                 /// if let Some(x) = type_map.get_mut::<&str>() {
@@ -317,7 +320,7 @@ macro_rules! impl_bounded_map {
                 /// # Examples
                 ///
                 /// ```
-                /// use ::static_type_map::StaticTypeMap;
+                /// use static_type_map::StaticTypeMap;
                 /// let mut type_map = StaticTypeMap::new();
                 /// assert_eq!(type_map.insert("a"), None);
                 /// assert_eq!(type_map.insert("b"), Some("a"));
@@ -339,7 +342,7 @@ macro_rules! impl_bounded_map {
                 /// # Examples
                 ///
                 /// ```
-                /// use ::static_type_map::StaticTypeMap;
+                /// use static_type_map::StaticTypeMap;
                 /// let mut type_map = StaticTypeMap::new();
                 /// type_map.insert("a");
                 /// assert_eq!(type_map.remove::<&str>(), Some("a"));
