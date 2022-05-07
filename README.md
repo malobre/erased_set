@@ -6,20 +6,20 @@
 [Crates.io](https://crates.io/crates/static_type_map)
 
 This crates provides a
-[`StaticTypeMap`](https://docs.rs/static_type_map/0.4/static_type_map/struct.StaticTypeMap.html)
+[`StaticTypeMap`](https://docs.rs/static_type_map/static_type_map/struct.StaticTypeMap.html)
 which allows you to store a single instance of any `'static` value as long as it
 implements [`Any`](https://doc.rust-lang.org/stable/std/any/trait.Any.html).
 
-The crate is `no_std` compatible using the `no_std` feature, (`alloc` is
+The crate is `no_std` compatible using the `hasbrown` feature, (`alloc` is still
 required).
 
 ## Features
 
-| name     | default ? | description                                                                                                              |
-| -------- | --------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `send`   | yes       | Enables [`SendStaticTypeMap`](https://docs.rs/static_type_map/0.4/static_type_map/struct.SendStaticTypeMap.html)         |
-| `sync`   | yes       | Enables [`SendSyncStaticTypeMap`](https://docs.rs/static_type_map/0.4/static_type_map/struct.SendSyncStaticTypeMap.html) |
-| `no_std` | no        | Enables `no_std` support                                                                                                 |
+| name        | default ? | description                                                                                                          |
+| ----------- | --------- | -------------------------------------------------------------------------------------------------------------------- |
+| `send`      | yes       | Enables [`SendStaticTypeMap`](https://docs.rs/static_type_map/static_type_map/struct.SendStaticTypeMap.html)         |
+| `sync`      | yes       | Enables [`SendSyncStaticTypeMap`](https://docs.rs/static_type_map/static_type_map/struct.SendSyncStaticTypeMap.html) |
+| `hashbrown` | no        | Enables `no_std` support                                                                                             |
 
 ## Example
 

@@ -25,18 +25,18 @@
 //! ```
 
 #![forbid(unsafe_code)]
-#![cfg_attr(feature = "no_std", no_std)]
+#![cfg_attr(feature = "hashbrown", no_std)]
 
-#[cfg(feature = "no_std")]
+#[cfg(feature = "hashbrown")]
 extern crate alloc;
-#[cfg(feature = "no_std")]
+#[cfg(feature = "hashbrown")]
 extern crate core;
-#[cfg(feature = "no_std")]
+#[cfg(feature = "hashbrown")]
 use alloc::boxed::Box;
-#[cfg(feature = "no_std")]
+#[cfg(feature = "hashbrown")]
 use hashbrown::HashMap;
 
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "hashbrown"))]
 use std::collections::HashMap;
 
 use core::any::{Any, TypeId};
