@@ -296,7 +296,11 @@ macro_rules! define_bounded_map {
     }
 }
 
-define_bounded_map!(StaticTypeMap, Any);
+define_bounded_map!(
+    /// A map where the key is the type of the value.
+    StaticTypeMap,
+    Any
+);
 
 #[cfg(feature = "send")]
 define_bounded_map!(
