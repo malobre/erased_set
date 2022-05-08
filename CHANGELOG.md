@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `hashbrown` feature, replaces `no_std`.
+- `Debug` implementations.
 
 ### Removed
 - `no_std` feature.
