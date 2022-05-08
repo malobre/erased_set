@@ -49,12 +49,6 @@ macro_rules! define_bounded_map {
         $(#[$attr])*
         $vis struct $name(HashMap<TypeId, Box<dyn $bound $(+ $others)*>>);
 
-        impl Default for $name {
-            fn default() -> Self {
-                Self(HashMap::new())
-            }
-        }
-
         impl $name {
             #[doc = concat!("Creates an empty [`", stringify!($name), "`].")]
             ///
@@ -301,20 +295,20 @@ macro_rules! define_bounded_map {
 
 define_bounded_map! {
     /// A map where the key is the type of the value.
-    #[derive(Debug)]
+    #[derive(Debug, Default)]
     pub struct StaticTypeMap: Any;
 }
 
 #[cfg(feature = "send")]
 define_bounded_map! {
     /// Like [`StaticTypeMap`] but with a [`Send`] bound.
-    #[derive(Debug)]
+    #[derive(Debug, Default)]
     pub struct SendStaticTypeMap: Any + Send;
 }
 
 #[cfg(feature = "sync")]
 define_bounded_map! {
     /// Like [`StaticTypeMap`] but with a [`Send`] + [`Sync`] bound.
-    #[derive(Debug)]
+    #[derive(Debug, Default)]
     pub struct SendSyncStaticTypeMap: Any + Send + Sync;
 }
