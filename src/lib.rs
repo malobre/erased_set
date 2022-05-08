@@ -1,7 +1,15 @@
-//! This crate provides a [`StaticTypeMap`] which allows you to store a single instance of any
-//! `'static` value as long as it implements [`Any`].
+//! # 🦀 `StaticTypeMap`
 //!
-//! # Examples
+//! _A map where the key is the type of the value._
+//!
+//! ---
+//!
+//! You may be looking for:
+//!
+//! - [Git repository](https://github.com/malobre/static_type_map)
+//! - [Crates.io](https://crates.io/crates/static_type_map)
+//!
+//! ## Example
 //!
 //! ```
 //! # use static_type_map::StaticTypeMap;
@@ -23,6 +31,14 @@
 //!
 //! assert_eq!(type_map.len(), 3);
 //! ```
+//!
+//! ## Features
+//!
+//! | name        | default ? | description                       |
+//! | ----------- | --------- | --------------------------------- |
+//! | `send`      | yes       | Enables [`SendStaticTypeMap`]     |
+//! | `sync`      | yes       | Enables [`SendSyncStaticTypeMap`] |
+//! | `hashbrown` | no        | Enables `no_std` support          |
 
 #![forbid(unsafe_code)]
 #![cfg_attr(feature = "hashbrown", no_std)]
