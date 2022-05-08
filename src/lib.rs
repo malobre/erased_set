@@ -42,9 +42,12 @@ use std::collections::HashMap;
 use core::any::{Any, TypeId};
 
 macro_rules! define_bounded_map {
-    ($(#[$attr:meta])* $name:ident, $bound:tt $(+ $others:tt)*) => {
+    (
+        $(#[$attr:meta])*
+        $vis:vis struct $name:ident: $bound:tt $(+ $others:tt)*;
+    ) => {
         $(#[$attr])*
-        pub struct $name(HashMap<TypeId, Box<dyn $bound $(+ $others)*>>);
+        $vis struct $name(HashMap<TypeId, Box<dyn $bound $(+ $others)*>>);
 
         impl Default for $name {
             fn default() -> Self {
@@ -296,22 +299,19 @@ macro_rules! define_bounded_map {
     }
 }
 
-define_bounded_map!(
+define_bounded_map! {
     /// A map where the key is the type of the value.
-    StaticTypeMap,
-    Any
-);
+    pub struct StaticTypeMap: Any;
+}
 
 #[cfg(feature = "send")]
-define_bounded_map!(
+define_bounded_map! {
     /// Like [`StaticTypeMap`] but with a [`Send`] bound.
-    SendStaticTypeMap,
-    Any + Send
-);
+    pub struct SendStaticTypeMap: Any + Send;
+}
 
 #[cfg(feature = "sync")]
-define_bounded_map!(
+define_bounded_map! {
     /// Like [`StaticTypeMap`] but with a [`Send`] + [`Sync`] bound.
-    SendSyncStaticTypeMap,
-    Any + Send + Sync
-);
+    pub struct SendSyncStaticTypeMap: Any + Send + Sync;
+}
