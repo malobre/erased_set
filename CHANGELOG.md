@@ -22,6 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.1] - 2022-02-06
 
-[unreleased]: https://github.com/malobre/pg_mapper/compare/v0.5.0...HEAD
-[0.5.0]: https://github.com/malobre/pg_mapper/compare/v0.4.1...v0.5.0
-[0.4.1]: https://github.com/malobre/pg_mapper/releases/tag/v0.4.1
+[unreleased]: https://github.com/malobre/static_type_map/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/malobre/static_type_map/compare/v0.4.1...v0.5.0
+[0.4.1]: https://github.com/malobre/static_type_map/releases/tag/v0.4.1
