@@ -65,6 +65,7 @@ macro_rules! define_bounded_map {
         $(#[$attr])*
         $vis struct $name(HashMap<TypeId, Box<dyn Any $(+ $bounds)*>>);
 
+        #[allow(rustdoc::private_doc_tests)]
         impl $name {
             #[doc = concat!("Creates an empty [`", stringify!($name), "`].")]
             ///
