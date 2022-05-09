@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Rename `StaticTypeMap` to `TypeMap`.
+- Rename `SendStaticTypeMap` to `SendTypeMap`.
+- Rename `SendSyncStaticTypeMap` to `SyncTypeMap`.
+
 ## [0.5.0] - 2022-05-08
 
 ### Changed

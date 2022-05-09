@@ -12,8 +12,9 @@
 //! ## Example
 //!
 //! ```
-//! # use static_type_map::StaticTypeMap;
-//! let mut type_map = StaticTypeMap::new();
+//! use static_type_map::TypeMap;
+//!
+//! let mut type_map = TypeMap::new();
 //! type_map.insert(10u8);
 //! type_map.insert(20u16);
 //! type_map.insert(true);
@@ -34,11 +35,11 @@
 //!
 //! ## Features
 //!
-//! | name        | default ? | description                       |
-//! | ----------- | --------- | --------------------------------- |
-//! | `send`      | yes       | Enables [`SendStaticTypeMap`]     |
-//! | `sync`      | yes       | Enables [`SendSyncStaticTypeMap`] |
-//! | `hashbrown` | no        | Enables `no_std` support          |
+//! | name        | default ? | description              |
+//! | ----------- | --------- | ------------------------ |
+//! | `send`      | yes       | Enables [`SendTypeMap`]  |
+//! | `sync`      | yes       | Enables [`SyncTypeMap`]  |
+//! | `hashbrown` | no        | Enables `no_std` support |
 
 #![forbid(unsafe_code)]
 #![cfg_attr(feature = "hashbrown", no_std)]
@@ -327,19 +328,19 @@ macro_rules! define_bounded_map {
 define_bounded_map! {
     /// A map where the key is the type of the value.
     #[derive(Debug, Default)]
-    pub struct StaticTypeMap: Any;
+    pub struct TypeMap: Any;
 }
 
 #[cfg(feature = "send")]
 define_bounded_map! {
-    /// Like [`StaticTypeMap`] but with a [`Send`] bound.
+    /// Like [`TypeMap`] but with a [`Send`] bound.
     #[derive(Debug, Default)]
-    pub struct SendStaticTypeMap: Any + Send;
+    pub struct SendTypeMap: Any + Send;
 }
 
 #[cfg(feature = "sync")]
 define_bounded_map! {
-    /// Like [`StaticTypeMap`] but with a [`Send`] + [`Sync`] bound.
+    /// Like [`TypeMap`] but with a [`Send`] + [`Sync`] bound.
     #[derive(Debug, Default)]
-    pub struct SendSyncStaticTypeMap: Any + Send + Sync;
+    pub struct SyncTypeMap: Any + Send + Sync;
 }
