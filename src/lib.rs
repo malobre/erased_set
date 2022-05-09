@@ -60,10 +60,10 @@ use core::any::{Any, TypeId};
 macro_rules! define_bounded_map {
     (
         $(#[$attr:meta])*
-        $vis:vis struct $name:ident: $bound:tt $(+ $others:tt)*;
+        $vis:vis struct $name:ident: Any $(+ $bounds:tt)*;
     ) => {
         $(#[$attr])*
-        $vis struct $name(HashMap<TypeId, Box<dyn $bound $(+ $others)*>>);
+        $vis struct $name(HashMap<TypeId, Box<dyn Any $(+ $bounds)*>>);
 
         impl $name {
             #[doc = concat!("Creates an empty [`", stringify!($name), "`].")]
@@ -241,7 +241,7 @@ macro_rules! define_bounded_map {
             #[must_use]
             pub fn get<T>(&self) -> Option<&T>
             where
-                T: $bound $(+ $others)*,
+                T: Any $(+ $bounds)*,
             {
                 self.0
                     .get(&TypeId::of::<T>())
@@ -267,7 +267,7 @@ macro_rules! define_bounded_map {
             #[must_use]
             pub fn get_mut<T>(&mut self) -> Option<&mut T>
             where
-                T: $bound $(+ $others)*,
+                T: Any $(+ $bounds)*,
             {
                 self.0
                     .get_mut(&TypeId::of::<T>())
@@ -289,7 +289,7 @@ macro_rules! define_bounded_map {
             /// ```
             pub fn insert<T>(&mut self, t: T) -> Option<T>
             where
-                T: $bound $(+ $others)*,
+                T: Any $(+ $bounds)*,
             {
                 self.0
                     .insert(TypeId::of::<T>(), Box::new(t))
@@ -312,7 +312,7 @@ macro_rules! define_bounded_map {
             /// ```
             pub fn remove<T>(&mut self) -> Option<T>
             where
-                T: $bound $(+ $others)*,
+                T: Any $(+ $bounds)*,
             {
                 self.0
                     .remove(&TypeId::of::<T>())
