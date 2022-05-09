@@ -58,7 +58,7 @@ use std::collections::HashMap;
 
 use core::any::{Any, TypeId};
 
-macro_rules! define_bounded_map {
+macro_rules! impl_type_map {
     (
         $(#[$attr:meta])*
         $vis:vis struct $name:ident: Any $(+ $bounds:tt)*;
@@ -325,21 +325,21 @@ macro_rules! define_bounded_map {
     }
 }
 
-define_bounded_map! {
+impl_type_map! {
     /// A map where the key is the type of the value.
     #[derive(Debug, Default)]
     pub struct TypeMap: Any;
 }
 
 #[cfg(feature = "send")]
-define_bounded_map! {
+impl_type_map! {
     /// Like [`TypeMap`] but with a [`Send`] bound.
     #[derive(Debug, Default)]
     pub struct SendTypeMap: Any + Send;
 }
 
 #[cfg(feature = "sync")]
-define_bounded_map! {
+impl_type_map! {
     /// Like [`TypeMap`] but with a [`Send`] + [`Sync`] bound.
     #[derive(Debug, Default)]
     pub struct SyncTypeMap: Any + Send + Sync;
