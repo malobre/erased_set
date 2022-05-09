@@ -246,7 +246,7 @@ macro_rules! define_bounded_map {
             {
                 self.0
                     .get(&TypeId::of::<T>())
-                    .and_then(|any| (&**any as &(dyn Any)).downcast_ref())
+                    .and_then(|any| any.downcast_ref())
             }
 
             /// Returns a mutable reference to an instance of `T`.
@@ -272,7 +272,7 @@ macro_rules! define_bounded_map {
             {
                 self.0
                     .get_mut(&TypeId::of::<T>())
-                    .and_then(|any| (&mut **any as &mut (dyn Any)).downcast_mut())
+                    .and_then(|any| any.downcast_mut())
             }
 
             /// Insert an instance of type `T` into the map.
@@ -288,14 +288,14 @@ macro_rules! define_bounded_map {
             /// assert_eq!(type_map.insert("a"), None);
             /// assert_eq!(type_map.insert("b"), Some("a"));
             /// ```
-            pub fn insert<T>(&mut self, t: T) -> Option<T>
+            pub fn insert<T>(&mut self, value: T) -> Option<T>
             where
                 T: Any $(+ $bounds)*,
             {
                 self.0
-                    .insert(TypeId::of::<T>(), Box::new(t))
-                    .and_then(|any| (any as Box<dyn Any>).downcast().ok())
-                    .map(|concrete_type| *concrete_type)
+                    .insert(TypeId::of::<T>(), Box::new(value))
+                    .and_then(|boxed_any| boxed_any.downcast().ok())
+                    .map(|boxed_value| *boxed_value)
             }
 
             /// Remove and return an instance of type `T` from the map.
@@ -317,8 +317,8 @@ macro_rules! define_bounded_map {
             {
                 self.0
                     .remove(&TypeId::of::<T>())
-                    .and_then(|any| (any as Box<dyn Any>).downcast().ok())
-                    .map(|concrete_type| *concrete_type)
+                    .and_then(|boxed_any| boxed_any.downcast().ok())
+                    .map(|boxed_value| *boxed_value)
             }
         }
     }
