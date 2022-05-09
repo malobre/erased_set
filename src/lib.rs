@@ -74,7 +74,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let type_map = ", stringify!($name), "::new();")]
             /// ```
             #[must_use]
@@ -90,7 +91,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let type_map = ", stringify!($name), "::with_capacity(10);")]
             /// ```
             #[must_use]
@@ -106,7 +108,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let type_map = ", stringify!($name), "::with_capacity(100);")]
             /// assert!(type_map.capacity() >= 100);
             /// ```
@@ -120,7 +123,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let type_map = ", stringify!($name), "::new();")]
             /// assert!(type_map.is_empty());
             /// ```
@@ -134,7 +138,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let mut type_map = ", stringify!($name), "::new();")]
             /// assert_eq!(type_map.len(), 0);
             /// type_map.insert("a");
@@ -150,7 +155,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let mut type_map = ", stringify!($name), "::new();")]
             /// type_map.insert("a");
             /// type_map.clear();
@@ -169,7 +175,8 @@ macro_rules! define_bounded_map {
             ///
             /// # Examples
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let mut type_map = ", stringify!($name), "::new();")]
             /// assert_eq!(type_map.capacity(), 0);
             /// type_map.reserve(10);
@@ -186,7 +193,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let mut type_map = ", stringify!($name), "::with_capacity(100);")]
             /// assert!(type_map.capacity() >= 0);
             /// type_map.insert("a");
@@ -202,7 +210,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let mut type_map = ", stringify!($name), "::new();")]
             /// type_map.insert("a");
             /// assert!(type_map.contains::<&str>());
@@ -214,6 +223,7 @@ macro_rules! define_bounded_map {
             {
                 self.0.contains_key(&TypeId::of::<T>())
             }
+
             /// Returns a reference to an instance of `T`.
             ///
             /// If the map does not have an instance of `T`, [`None`] is returned.
@@ -221,7 +231,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let mut type_map = ", stringify!($name), "::new();")]
             /// type_map.insert("a");
             /// assert_eq!(type_map.get::<&str>(), Some(&"a"));
@@ -244,7 +255,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let mut type_map = ", stringify!($name), "::new();")]
             /// type_map.insert("a");
             /// if let Some(x) = type_map.get_mut::<&str>() {
@@ -269,7 +281,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let mut type_map = ", stringify!($name), "::new();")]
             /// assert_eq!(type_map.insert("a"), None);
             /// assert_eq!(type_map.insert("b"), Some("a"));
@@ -291,7 +304,8 @@ macro_rules! define_bounded_map {
             /// # Examples
             ///
             /// ```
-            #[doc = concat!("# use static_type_map::", stringify!($name), ";")]
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
             #[doc = concat!("let mut type_map = ", stringify!($name), "::new();")]
             /// type_map.insert("a");
             /// assert_eq!(type_map.remove::<&str>(), Some("a"));
