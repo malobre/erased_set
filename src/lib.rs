@@ -41,7 +41,6 @@
 //! | `sync`      | yes       | Enables [`SyncTypeMap`]  |
 //! | `hashbrown` | no        | Enables `no_std` support |
 
-#![forbid(unsafe_code)]
 #![cfg_attr(feature = "hashbrown", no_std)]
 
 #[cfg(feature = "hashbrown")]
@@ -247,7 +246,14 @@ macro_rules! impl_type_map {
             {
                 self.0
                     .get(&TypeId::of::<T>())
-                    .and_then(|any| any.downcast_ref())
+                    .map(|boxed_any: &Box<dyn Any $(+ $bounds)*>| {
+                        let any_ref: &dyn Any = boxed_any.as_ref();
+
+                        // Sanity check
+                        debug_assert!(any_ref.is::<T>());
+
+                        unsafe { &*(any_ref as *const dyn Any as *const T) }
+                    })
             }
 
             /// Returns a mutable reference to an instance of `T`.
@@ -273,7 +279,14 @@ macro_rules! impl_type_map {
             {
                 self.0
                     .get_mut(&TypeId::of::<T>())
-                    .and_then(|any| any.downcast_mut())
+                    .map(|boxed_any: &mut Box<dyn Any $(+ $bounds)*>| {
+                        let any_mut: &mut dyn Any = boxed_any.as_mut();
+
+                        // Sanity check
+                        debug_assert!(any_mut.is::<T>());
+
+                        unsafe { &mut *(any_mut as *mut dyn Any as *mut T) }
+                    })
             }
 
             /// Insert an instance of type `T` into the map.
@@ -295,8 +308,14 @@ macro_rules! impl_type_map {
             {
                 self.0
                     .insert(TypeId::of::<T>(), Box::new(value))
-                    .and_then(|boxed_any| boxed_any.downcast().ok())
-                    .map(|boxed_value| *boxed_value)
+                    .map(|boxed_any: Box<dyn Any $(+ $bounds)*>| {
+                        // Sanity check
+                        debug_assert!((&*boxed_any).is::<T>());
+
+                        let ptr: *mut dyn Any = Box::into_raw(boxed_any);
+
+                        unsafe { *Box::from_raw(ptr as *mut T) }
+                    })
             }
 
             /// Remove and return an instance of type `T` from the map.
@@ -318,8 +337,14 @@ macro_rules! impl_type_map {
             {
                 self.0
                     .remove(&TypeId::of::<T>())
-                    .and_then(|boxed_any| boxed_any.downcast().ok())
-                    .map(|boxed_value| *boxed_value)
+                    .map(|boxed_any: Box<dyn Any $(+ $bounds)*>| {
+                        // Sanity check
+                        debug_assert!((&*boxed_any).is::<T>());
+
+                        let ptr: *mut dyn Any = Box::into_raw(boxed_any);
+
+                        unsafe { *Box::from_raw(ptr as *mut T) }
+                    })
             }
         }
     }
