@@ -8,9 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Rename `StaticTypeMap` to `TypeMap`.
-- Rename `SendStaticTypeMap` to `SendTypeMap`.
-- Rename `SendSyncStaticTypeMap` to `SyncTypeMap`.
+- Rename crate to `erased_set`.
+- Rename `StaticTypeMap` to `ErasedSet`.
+- Rename `SendStaticTypeMap` to `ErasedSendSet`.
+- Rename `SendSyncStaticTypeMap` to `ErasedSyncSet`.
 
 ## [0.5.1] - 2022-05-08
 
@@ -24,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.1] - 2022-02-06
 
-[unreleased]: https://github.com/malobre/static_type_map/compare/v0.5.1...HEAD
-[0.5.1]: https://github.com/malobre/static_type_map/compare/v0.5.0...v0.5.1
-[0.5.0]: https://github.com/malobre/static_type_map/compare/v0.4.1...v0.5.0
-[0.4.1]: https://github.com/malobre/static_type_map/releases/tag/v0.4.1
+[unreleased]: https://github.com/malobre/erased_set/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/malobre/erased_set/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/malobre/erased_set/compare/v0.4.1...v0.5.0
+[0.4.1]: https://github.com/malobre/erased_set/releases/tag/v0.4.1

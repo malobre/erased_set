@@ -1,15 +1,15 @@
-# 🦀 `StaticTypeMap`
+# 🦀 `ErasedSet`
 
-_A map where the key is the type of the value._
+_A set of erased types._
 
 ---
 
 You may be looking for:
 
-- [API Documentation](https://docs.rs/static_type_map)
-- [Examples](https://docs.rs/static_type_map/#example)
-- [Features](https://docs.rs/static_type_map/#features)
-- [Crates.io](https://crates.io/crates/static_type_map)
+- [API Documentation](https://docs.rs/erased_set)
+- [Examples](https://docs.rs/erased_set/#example)
+- [Features](https://docs.rs/erased_set/#features)
+- [Crates.io](https://crates.io/crates/erased_set)
 
 ## License
 
