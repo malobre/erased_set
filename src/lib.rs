@@ -81,7 +81,7 @@ macro_rules! impl_erased_set {
             /// ```
             #[must_use]
             pub fn new() -> Self {
-                Self { ..Self::default() }
+                Self(HashMap::new())
             }
 
             #[doc = concat!("Creates an empty [`", stringify!($name), "`] with the specified capacity.")]
