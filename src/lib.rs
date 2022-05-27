@@ -247,12 +247,12 @@ macro_rules! impl_erased_set {
                 self.0
                     .get(&TypeId::of::<T>())
                     .map(|boxed_any: &Box<dyn Any $(+ $bounds)*>| {
-                        let any_ref: &dyn Any = boxed_any.as_ref();
-
                         // Sanity check
-                        debug_assert!(any_ref.is::<T>());
+                        debug_assert!(boxed_any.as_ref().is::<T>());
 
-                        unsafe { &*(any_ref as *const dyn Any as *const T) }
+                        let ptr = (boxed_any.as_ref() as *const dyn Any).cast::<T>();
+
+                        unsafe { &*ptr }
                     })
             }
 
@@ -280,12 +280,12 @@ macro_rules! impl_erased_set {
                 self.0
                     .get_mut(&TypeId::of::<T>())
                     .map(|boxed_any: &mut Box<dyn Any $(+ $bounds)*>| {
-                        let any_mut: &mut dyn Any = boxed_any.as_mut();
-
                         // Sanity check
-                        debug_assert!(any_mut.is::<T>());
+                        debug_assert!(boxed_any.as_mut().is::<T>());
 
-                        unsafe { &mut *(any_mut as *mut dyn Any as *mut T) }
+                        let ptr = (boxed_any.as_mut() as *mut dyn Any).cast::<T>();
+
+                        unsafe { &mut *ptr }
                     })
             }
 
@@ -310,11 +310,11 @@ macro_rules! impl_erased_set {
                     .insert(TypeId::of::<T>(), Box::new(value))
                     .map(|boxed_any: Box<dyn Any $(+ $bounds)*>| {
                         // Sanity check
-                        debug_assert!((&*boxed_any).is::<T>());
+                        debug_assert!(boxed_any.as_ref().is::<T>());
 
-                        let ptr: *mut dyn Any = Box::into_raw(boxed_any);
+                        let ptr = Box::into_raw(boxed_any).cast::<T>();
 
-                        unsafe { *Box::from_raw(ptr as *mut T) }
+                        unsafe { *Box::from_raw(ptr) }
                     })
             }
 
@@ -339,11 +339,11 @@ macro_rules! impl_erased_set {
                     .remove(&TypeId::of::<T>())
                     .map(|boxed_any: Box<dyn Any $(+ $bounds)*>| {
                         // Sanity check
-                        debug_assert!((&*boxed_any).is::<T>());
+                        debug_assert!(boxed_any.as_ref().is::<T>());
 
-                        let ptr: *mut dyn Any = Box::into_raw(boxed_any);
+                        let ptr = Box::into_raw(boxed_any).cast::<T>();
 
-                        unsafe { *Box::from_raw(ptr as *mut T) }
+                        unsafe { *Box::from_raw(ptr) }
                     })
             }
         }
