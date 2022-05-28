@@ -314,7 +314,7 @@ macro_rules! impl_erased_set {
 
             /// Insert an instance of type `T` into the set.
             ///
-            /// If the set did not have this type present, [`None`] is returned.
+            /// Returns the replaced value or [`None`].
             ///
             /// # Examples
             ///
