@@ -281,6 +281,36 @@ macro_rules! impl_erased_set {
                     })
             }
 
+            /// Inserts the given `value` into the set if it is not present, then
+            /// returns a reference to the value in the set.
+            ///
+            /// # Examples
+            ///
+            /// ```
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
+            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
+            /// assert_eq!(erased_set.get_or_insert("abc"), &"abc");
+            /// assert_eq!(erased_set.get_or_insert("def"), &"abc");
+            /// ```
+            #[must_use]
+            pub fn get_or_insert<T>(&mut self, value: T) -> &T
+            where
+                T: Any $(+ $bounds)*,
+            {
+                let boxed_any: &Box<dyn Any $(+ $bounds)*> = self
+                    .0
+                    .entry(TypeId::of::<T>())
+                    .or_insert_with(|| Box::new(value));
+
+                // Sanity check
+                debug_assert!(boxed_any.as_ref().is::<T>());
+
+                let ptr = (boxed_any.as_ref() as *const dyn Any).cast::<T>();
+
+                unsafe { &*ptr }
+            }
+
             /// Returns a mutable reference to an instance of `T`.
             ///
             /// If the set does not have an instance of `T`, [`None`] is returned.
