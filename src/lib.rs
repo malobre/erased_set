@@ -187,6 +187,29 @@ macro_rules! impl_erased_set {
                 self.0.reserve(additional);
             }
 
+            /// Shrinks the capacity of the set with a lower limit. It will drop
+            /// down no lower than the supplied limit while maintaining the internal rules
+            /// and possibly leaving some space in accordance with the resize policy.
+            ///
+            /// If the current capacity is less than the lower limit, this is a no-op.
+            ///
+            /// # Examples
+            /// ```
+            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
+            ///
+            #[doc = concat!("let mut erased_set = ", stringify!($name), "::with_capacity(100);")]
+            /// erased_set.insert(1_u8);
+            /// erased_set.insert(1_u16);
+            /// assert!(erased_set.capacity() >= 100);
+            /// erased_set.shrink_to(10);
+            /// assert!(erased_set.capacity() >= 10);
+            /// erased_set.shrink_to(0);
+            /// assert!(erased_set.capacity() >= 2);
+            /// ```
+            pub fn shrink_to(&mut self, min_capacity: usize) {
+                self.0.shrink_to(min_capacity)
+            }
+
             /// Shrinks the capacity of the set as much as possible. It will drop down as much as possible
             /// while mainting the internal rules and possibly leaving some space in accordance with the
             /// resize policy.
