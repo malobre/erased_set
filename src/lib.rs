@@ -175,6 +175,7 @@ macro_rules! impl_erased_set {
             /// Panics if the new allocation size overflows [`usize`].
             ///
             /// # Examples
+            ///
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
@@ -194,6 +195,7 @@ macro_rules! impl_erased_set {
             /// If the current capacity is less than the lower limit, this is a no-op.
             ///
             /// # Examples
+            ///
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
