@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2022-05-28
+
 ### Added
 - `ErasedSet::shrink_to`
 - `ErasedSet::get_or_insert`
@@ -32,7 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.1] - 2022-02-06
 
-[unreleased]: https://github.com/malobre/erased_set/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/malobre/erased_set/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/malobre/erased_set/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/malobre/erased_set/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/malobre/erased_set/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/malobre/erased_set/compare/v0.4.1...v0.5.0

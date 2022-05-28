@@ -1,7 +1,7 @@
 [package]
 name = "erased_set"
 description = "A set of erased types"
-version = "0.6.0"
+version = "0.6.1"
 authors = ["Maël Obréjan <mael.obrejan@protonmail.com>"]
 edition = "2021"
 license = "MIT"
