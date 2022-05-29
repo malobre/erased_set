@@ -57,6 +57,25 @@ use std::collections::HashMap;
 
 use core::any::{Any, TypeId};
 
+/// Implement an erased set with the specified bounds.
+///
+/// # Syntax
+///
+/// ```ignore
+/// impl_erased_set! {
+///     [pub] struct NAME: Any [+ BOUNDS ...];
+/// }
+/// ```
+///
+/// # Example
+///
+/// ```rust
+/// erased_set::impl_erased_set! {
+///     /// A set of erased types.
+///     #[derive(Debug, Default)]
+///     pub struct ErasedSet: Any;
+/// }
+/// ```
 macro_rules! impl_erased_set {
     (
         $(#[$attr:meta])*
