@@ -1,36 +1,37 @@
 //! # 🦀 `ErasedSet`
 //!
-//! _A set of erased types._
-//!
-//! ---
-//!
 //! You may be looking for:
 //!
 //! - [Git repository](https://github.com/malobre/erased_set)
 //! - [Crates.io](https://crates.io/crates/erased_set)
 //!
+//! ---
+//!
+//! This crate provides a new collection: The [`ErasedSet`].
+//!
+//! It can store any type `T: Any`.
+//!
 //! ## Example
 //!
 //! ```
+//! # #[derive(Debug, PartialEq)]
+//! # struct ClickEvent(u32, u32);
+//! # #[derive(Debug, PartialEq)]
+//! # struct KeyDownEvent(char);
+//! #
 //! use erased_set::ErasedSet;
 //!
-//! let mut erased_set = ErasedSet::new();
-//! erased_set.insert(10u8);
-//! erased_set.insert(20u16);
-//! erased_set.insert(true);
-//! erased_set.insert("a");
+//! let mut set = ErasedSet::new();
+//! set.insert(ClickEvent(128, 256));
+//! set.insert(KeyDownEvent('z'));
 //!
-//! assert!(erased_set.contains::<bool>());
+//! assert_eq!(set.get::<ClickEvent>(), Some(&ClickEvent(128, 256)));
 //!
-//! assert_eq!(erased_set.get::<&str>(), Some(&"a"));
+//! assert_eq!(set.insert(KeyDownEvent('e')), Some(KeyDownEvent('z')));
 //!
-//! if let Some(previous_value) = erased_set.insert(50u8) {
-//!     assert_eq!(previous_value, 10u8);
-//! }
+//! set.remove::<ClickEvent>();
 //!
-//! erased_set.remove::<u16>();
-//!
-//! assert_eq!(erased_set.len(), 3);
+//! assert_eq!(set.len(), 1);
 //! ```
 //!
 //! ## Features
@@ -96,7 +97,7 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let erased_set = ", stringify!($name), "::new();")]
+            #[doc = concat!("let set = ", stringify!($name), "::new();")]
             /// ```
             #[must_use]
             pub fn new() -> Self {
@@ -113,7 +114,7 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let erased_set = ", stringify!($name), "::with_capacity(10);")]
+            #[doc = concat!("let set = ", stringify!($name), "::with_capacity(10);")]
             /// ```
             #[must_use]
             pub fn with_capacity(capacity: usize) -> Self {
@@ -130,8 +131,8 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let erased_set = ", stringify!($name), "::with_capacity(100);")]
-            /// assert!(erased_set.capacity() >= 100);
+            #[doc = concat!("let set = ", stringify!($name), "::with_capacity(100);")]
+            /// assert!(set.capacity() >= 100);
             /// ```
             #[must_use]
             pub fn capacity(&self) -> usize {
@@ -145,8 +146,8 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let erased_set = ", stringify!($name), "::new();")]
-            /// assert!(erased_set.is_empty());
+            #[doc = concat!("let set = ", stringify!($name), "::new();")]
+            /// assert!(set.is_empty());
             /// ```
             #[must_use]
             pub fn is_empty(&self) -> bool {
@@ -160,10 +161,10 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
-            /// assert_eq!(erased_set.len(), 0);
-            /// erased_set.insert("a");
-            /// assert_eq!(erased_set.len(), 1);
+            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
+            /// assert_eq!(set.len(), 0);
+            /// set.insert("a");
+            /// assert_eq!(set.len(), 1);
             /// ```
             #[must_use]
             pub fn len(&self) -> usize {
@@ -177,10 +178,10 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
-            /// erased_set.insert("a");
-            /// erased_set.clear();
-            /// assert!(erased_set.is_empty());
+            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
+            /// set.insert("a");
+            /// set.clear();
+            /// assert!(set.is_empty());
             /// ```
             pub fn clear(&mut self) {
                 self.0.clear();
@@ -198,10 +199,10 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
-            /// assert_eq!(erased_set.capacity(), 0);
-            /// erased_set.reserve(10);
-            /// assert!(erased_set.capacity() >= 10);
+            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
+            /// assert_eq!(set.capacity(), 0);
+            /// set.reserve(10);
+            /// assert!(set.capacity() >= 10);
             /// ```
             pub fn reserve(&mut self, additional: usize) {
                 self.0.reserve(additional);
@@ -218,14 +219,14 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::with_capacity(100);")]
-            /// erased_set.insert(1_u8);
-            /// erased_set.insert(1_u16);
-            /// assert!(erased_set.capacity() >= 100);
-            /// erased_set.shrink_to(10);
-            /// assert!(erased_set.capacity() >= 10);
-            /// erased_set.shrink_to(0);
-            /// assert!(erased_set.capacity() >= 2);
+            #[doc = concat!("let mut set = ", stringify!($name), "::with_capacity(100);")]
+            /// set.insert(1_u8);
+            /// set.insert(1_u16);
+            /// assert!(set.capacity() >= 100);
+            /// set.shrink_to(10);
+            /// assert!(set.capacity() >= 10);
+            /// set.shrink_to(0);
+            /// assert!(set.capacity() >= 2);
             /// ```
             pub fn shrink_to(&mut self, min_capacity: usize) {
                 self.0.shrink_to(min_capacity)
@@ -240,11 +241,11 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::with_capacity(100);")]
-            /// assert!(erased_set.capacity() >= 0);
-            /// erased_set.insert("a");
-            /// erased_set.insert(true);
-            /// assert!(erased_set.capacity() >= 2);
+            #[doc = concat!("let mut set = ", stringify!($name), "::with_capacity(100);")]
+            /// assert!(set.capacity() >= 0);
+            /// set.insert("a");
+            /// set.insert(true);
+            /// assert!(set.capacity() >= 2);
             /// ```
             pub fn shrink_to_fit(&mut self) {
                 self.0.shrink_to_fit();
@@ -257,9 +258,9 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
-            /// erased_set.insert("a");
-            /// assert!(erased_set.contains::<&str>());
+            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
+            /// set.insert("a");
+            /// assert!(set.contains::<&str>());
             /// ```
             #[must_use]
             pub fn contains<T>(&self) -> bool
@@ -278,10 +279,10 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
-            /// erased_set.insert("a");
-            /// assert_eq!(erased_set.get::<&str>(), Some(&"a"));
-            /// assert_eq!(erased_set.get::<bool>(), None);
+            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
+            /// set.insert("a");
+            /// assert_eq!(set.get::<&str>(), Some(&"a"));
+            /// assert_eq!(set.get::<bool>(), None);
             /// ```
             #[must_use]
             pub fn get<T>(&self) -> Option<&T>
@@ -308,9 +309,9 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
-            /// assert_eq!(erased_set.get_or_insert("abc"), &"abc");
-            /// assert_eq!(erased_set.get_or_insert("def"), &"abc");
+            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
+            /// assert_eq!(set.get_or_insert("abc"), &"abc");
+            /// assert_eq!(set.get_or_insert("def"), &"abc");
             /// ```
             #[must_use]
             pub fn get_or_insert<T>(&mut self, value: T) -> &T
@@ -338,9 +339,9 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
-            /// assert_eq!(erased_set.get_or_insert_with(|| String::from("abc")), &"abc");
-            /// assert_eq!(erased_set.get_or_insert_with(|| String::from("def")), &"abc");
+            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
+            /// assert_eq!(set.get_or_insert_with(|| String::from("abc")), &"abc");
+            /// assert_eq!(set.get_or_insert_with(|| String::from("def")), &"abc");
             /// ```
             #[must_use]
             pub fn get_or_insert_with<T>(&mut self, f: impl FnOnce() -> T) -> &T
@@ -369,12 +370,12 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
-            /// erased_set.insert("a");
-            /// if let Some(x) = erased_set.get_mut::<&str>() {
+            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
+            /// set.insert("a");
+            /// if let Some(x) = set.get_mut::<&str>() {
             ///     *x = "b";
             /// }
-            /// assert_eq!(erased_set.get::<&str>(), Some(&"b"));
+            /// assert_eq!(set.get::<&str>(), Some(&"b"));
             /// ```
             #[must_use]
             pub fn get_mut<T>(&mut self) -> Option<&mut T>
@@ -402,9 +403,9 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
-            /// assert_eq!(erased_set.insert("a"), None);
-            /// assert_eq!(erased_set.insert("b"), Some("a"));
+            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
+            /// assert_eq!(set.insert("a"), None);
+            /// assert_eq!(set.insert("b"), Some("a"));
             /// ```
             pub fn insert<T>(&mut self, value: T) -> Option<T>
             where
@@ -431,9 +432,9 @@ macro_rules! impl_erased_set {
             /// ```
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
-            #[doc = concat!("let mut erased_set = ", stringify!($name), "::new();")]
-            /// erased_set.insert("a");
-            /// assert_eq!(erased_set.remove::<&str>(), Some("a"));
+            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
+            /// set.insert("a");
+            /// assert_eq!(set.remove::<&str>(), Some("a"));
             /// ```
             pub fn remove<T>(&mut self) -> Option<T>
             where
