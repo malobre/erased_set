@@ -242,9 +242,10 @@ macro_rules! impl_erased_set {
             #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
             ///
             #[doc = concat!("let mut set = ", stringify!($name), "::with_capacity(100);")]
-            /// assert!(set.capacity() >= 0);
-            /// set.insert("a");
-            /// set.insert(true);
+            /// set.insert(1_u8);
+            /// set.insert(1_u16);
+            /// assert!(set.capacity() >= 100);
+            /// set.shrink_to_fit();
             /// assert!(set.capacity() >= 2);
             /// ```
             pub fn shrink_to_fit(&mut self) {
