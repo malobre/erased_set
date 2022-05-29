@@ -77,6 +77,16 @@ use core::any::{Any, TypeId};
 ///     pub struct ErasedSet: Any;
 /// }
 /// ```
+// This macro is not currently public because:
+// - we have no way of checking if `no_std` is enabled inside the macro.
+//   This prevents us from choosing between types, e.g:
+//   - `Box` / `alloc::boxed::Box`,
+//   - `std::collections::HashMap` or a re-export of `hashbrown::HashMap`.
+// - we assume that `Any` and `TypeId` are in-scope, but this is trivial to fix.
+// - trait objects for multiple traits are not currently supported,
+//   see <https://github.com/rust-lang/rfcs/issues/2035> for more details.
+//
+// Apart from those problems the macro is written with external usage in mind.
 macro_rules! impl_erased_set {
     (
         $(#[$attr:meta])*
