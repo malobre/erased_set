@@ -82,7 +82,7 @@ macro_rules! impl_erased_set {
             ::alloc::collections::BTreeMap<
                 ::core::any::TypeId,
                 ::alloc::boxed::Box<dyn ::core::any::Any $(+ $bounds)*>
-            >
+            >,
         );
 
         #[allow(rustdoc::private_doc_tests)]
