@@ -11,6 +11,14 @@ readme = "README.md"
 keywords = ["anymap", "typemap", "map", "set"]
 include = ["src/**/*", "Cargo.toml", "LICENSE"]
 
+[[bench]]
+name = "iai"
+harness = false
+
+[[bench]]
+name = "criterion"
+harness = false
+
 [dependencies]
 hashbrown = { version = "0.12.0", optional = true }
 
@@ -18,3 +26,7 @@ hashbrown = { version = "0.12.0", optional = true }
 default = ["send", "sync"]
 send = []
 sync = []
+
+[dev-dependencies]
+criterion = "0.3.5"
+iai = "0.1.1"
