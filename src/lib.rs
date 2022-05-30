@@ -78,6 +78,7 @@ macro_rules! impl_erased_set {
     ) => {
         $(#[$attr])*
         $vis struct $name(
+            #[doc(hidden)]
             ::alloc::collections::BTreeMap<
                 ::core::any::TypeId,
                 ::alloc::boxed::Box<dyn ::core::any::Any $(+ $bounds)*>
