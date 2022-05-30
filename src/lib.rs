@@ -217,7 +217,6 @@ macro_rules! impl_erased_set {
             /// assert_eq!(set.get_or_insert("abc"), &"abc");
             /// assert_eq!(set.get_or_insert("def"), &"abc");
             /// ```
-            #[must_use]
             pub fn get_or_insert<T>(&mut self, value: T) -> &T
             where
                 T: ::core::any::Any $(+ $bounds)*,
@@ -250,7 +249,6 @@ macro_rules! impl_erased_set {
             /// assert_eq!(set.get_or_insert_with(|| String::from("abc")), &"abc");
             /// assert_eq!(set.get_or_insert_with(|| String::from("def")), &"abc");
             /// ```
-            #[must_use]
             pub fn get_or_insert_with<T>(&mut self, f: impl FnOnce() -> T) -> &T
             where
                 T: ::core::any::Any $(+ $bounds)*,

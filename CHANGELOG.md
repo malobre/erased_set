@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Remove `must_use` attribute on `ErasedSet::get_or_insert` and
+  `ErasedSet::get_or_insert_with`.
+
 ## [0.7.0] - 2022-05-30
 
 ### Removed
