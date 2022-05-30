@@ -375,7 +375,7 @@ macro_rules! impl_erased_set {
 impl_erased_set! {
     /// A set of erased types.
     ///
-    /// This set can store a single instance of any type that implements [`Any`].
+    /// This set can store a single instance of any type that implements [`Any`](::core::any::Any).
     #[derive(Debug, Default)]
     pub struct ErasedSet: Any;
 }
