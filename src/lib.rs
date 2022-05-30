@@ -40,23 +40,14 @@
 //! | ----------- | --------- | ------------------------- |
 //! | `send`      | yes       | Enables [`ErasedSendSet`] |
 //! | `sync`      | yes       | Enables [`ErasedSyncSet`] |
-//! | `hashbrown` | no        | Enables `no_std` support  |
+//!
+//! ## `no_std` support
+//!
+//! This crate is `no_std` compatible, however it still requires `alloc`.
 
-#![cfg_attr(feature = "hashbrown", no_std)]
+#![no_std]
 
-#[cfg(feature = "hashbrown")]
 extern crate alloc;
-#[cfg(feature = "hashbrown")]
-extern crate core;
-#[cfg(feature = "hashbrown")]
-use alloc::boxed::Box;
-#[cfg(feature = "hashbrown")]
-use hashbrown::HashMap;
-
-#[cfg(not(feature = "hashbrown"))]
-use std::collections::HashMap;
-
-use core::any::{Any, TypeId};
 
 /// Implement an erased set with the specified bounds.
 ///
@@ -77,23 +68,20 @@ use core::any::{Any, TypeId};
 ///     pub struct ErasedSet: Any;
 /// }
 /// ```
-// This macro is not currently public because:
-// - we have no way of checking if `no_std` is enabled inside the macro.
-//   This prevents us from choosing between types, e.g:
-//   - `Box` / `alloc::boxed::Box`,
-//   - `std::collections::HashMap` or a re-export of `hashbrown::HashMap`.
-// - we assume that `Any` and `TypeId` are in-scope, but this is trivial to fix.
-// - trait objects for multiple traits are not currently supported,
-//   see <https://github.com/rust-lang/rfcs/issues/2035> for more details.
-//
-// Apart from those problems the macro is written with external usage in mind.
+// This macro is not currently public because trait objects for multiple traits are not currently
+// supported, see <https://github.com/rust-lang/rfcs/issues/2035> for more details.
 macro_rules! impl_erased_set {
     (
         $(#[$attr:meta])*
         $vis:vis struct $name:ident: Any $(+ $bounds:tt)*;
     ) => {
         $(#[$attr])*
-        $vis struct $name(HashMap<TypeId, Box<dyn Any $(+ $bounds)*>>);
+        $vis struct $name(
+            ::alloc::collections::BTreeMap<
+                ::core::any::TypeId,
+                ::alloc::boxed::Box<dyn ::core::any::Any $(+ $bounds)*>
+            >
+        );
 
         #[allow(rustdoc::private_doc_tests)]
         impl $name {
@@ -111,42 +99,7 @@ macro_rules! impl_erased_set {
             /// ```
             #[must_use]
             pub fn new() -> Self {
-                Self(HashMap::new())
-            }
-
-            #[doc = concat!("Creates an empty [`", stringify!($name), "`] with the specified capacity.")]
-            ///
-            /// The set will be able to hold at least `capacity` types without reallocating.
-            /// If `capacity` is 0, the set will not allocate.
-            ///
-            /// # Examples
-            ///
-            /// ```
-            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
-            ///
-            #[doc = concat!("let set = ", stringify!($name), "::with_capacity(10);")]
-            /// ```
-            #[must_use]
-            pub fn with_capacity(capacity: usize) -> Self {
-                Self(HashMap::with_capacity(capacity))
-            }
-
-            /// Returns the number of types the set can hold without reallocating.
-            ///
-            /// This number is a lower bound; the set might be able to hold more, but it is
-            /// guaranteed to be able to hold at least so many.
-            ///
-            /// # Examples
-            ///
-            /// ```
-            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
-            ///
-            #[doc = concat!("let set = ", stringify!($name), "::with_capacity(100);")]
-            /// assert!(set.capacity() >= 100);
-            /// ```
-            #[must_use]
-            pub fn capacity(&self) -> usize {
-                self.0.capacity()
+                Self(::alloc::collections::BTreeMap::new())
             }
 
             /// Returns `true` if the set contains no instances of any type.
@@ -197,71 +150,6 @@ macro_rules! impl_erased_set {
                 self.0.clear();
             }
 
-            /// Reserves capacity for at least `additional` more types to be inserted in the set. The
-            /// collection may reserve more space to avoid frequent reallocations.
-            ///
-            /// # Panics
-            ///
-            /// Panics if the new allocation size overflows [`usize`].
-            ///
-            /// # Examples
-            ///
-            /// ```
-            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
-            ///
-            #[doc = concat!("let mut set = ", stringify!($name), "::new();")]
-            /// assert_eq!(set.capacity(), 0);
-            /// set.reserve(10);
-            /// assert!(set.capacity() >= 10);
-            /// ```
-            pub fn reserve(&mut self, additional: usize) {
-                self.0.reserve(additional);
-            }
-
-            /// Shrinks the capacity of the set with a lower limit. It will drop
-            /// down no lower than the supplied limit while maintaining the internal rules
-            /// and possibly leaving some space in accordance with the resize policy.
-            ///
-            /// If the current capacity is less than the lower limit, this is a no-op.
-            ///
-            /// # Examples
-            ///
-            /// ```
-            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
-            ///
-            #[doc = concat!("let mut set = ", stringify!($name), "::with_capacity(100);")]
-            /// set.insert(1_u8);
-            /// set.insert(1_u16);
-            /// assert!(set.capacity() >= 100);
-            /// set.shrink_to(10);
-            /// assert!(set.capacity() >= 10);
-            /// set.shrink_to(0);
-            /// assert!(set.capacity() >= 2);
-            /// ```
-            pub fn shrink_to(&mut self, min_capacity: usize) {
-                self.0.shrink_to(min_capacity)
-            }
-
-            /// Shrinks the capacity of the set as much as possible. It will drop down as much as possible
-            /// while mainting the internal rules and possibly leaving some space in accordance with the
-            /// resize policy.
-            ///
-            /// # Examples
-            ///
-            /// ```
-            #[doc = concat!("use ", module_path!(), "::", stringify!($name), ";")]
-            ///
-            #[doc = concat!("let mut set = ", stringify!($name), "::with_capacity(100);")]
-            /// set.insert(1_u8);
-            /// set.insert(1_u16);
-            /// assert!(set.capacity() >= 100);
-            /// set.shrink_to_fit();
-            /// assert!(set.capacity() >= 2);
-            /// ```
-            pub fn shrink_to_fit(&mut self) {
-                self.0.shrink_to_fit();
-            }
-
             /// Returns `true` if the set contains an instance of `T`.
             ///
             /// # Examples
@@ -276,9 +164,9 @@ macro_rules! impl_erased_set {
             #[must_use]
             pub fn contains<T>(&self) -> bool
             where
-                T: Any,
+                T: ::core::any::Any,
             {
-                self.0.contains_key(&TypeId::of::<T>())
+                self.0.contains_key(&::core::any::TypeId::of::<T>())
             }
 
             /// Returns a reference to an instance of `T`.
@@ -298,8 +186,11 @@ macro_rules! impl_erased_set {
             #[must_use]
             pub fn get<T>(&self) -> Option<&T>
             where
-                T: Any $(+ $bounds)*,
+                T: ::core::any::Any $(+ $bounds)*,
             {
+                use ::core::any::{Any, TypeId};
+                use ::alloc::boxed::Box;
+
                 self.0
                     .get(&TypeId::of::<T>())
                     .map(|boxed_any: &Box<dyn Any $(+ $bounds)*>| {
@@ -327,8 +218,11 @@ macro_rules! impl_erased_set {
             #[must_use]
             pub fn get_or_insert<T>(&mut self, value: T) -> &T
             where
-                T: Any $(+ $bounds)*,
+                T: ::core::any::Any $(+ $bounds)*,
             {
+                use ::core::any::{Any, TypeId};
+                use ::alloc::boxed::Box;
+
                 let boxed_any: &Box<dyn Any $(+ $bounds)*> = self
                     .0
                     .entry(TypeId::of::<T>())
@@ -357,8 +251,11 @@ macro_rules! impl_erased_set {
             #[must_use]
             pub fn get_or_insert_with<T>(&mut self, f: impl FnOnce() -> T) -> &T
             where
-                T: Any $(+ $bounds)*,
+                T: ::core::any::Any $(+ $bounds)*,
             {
+                use ::core::any::{Any, TypeId};
+                use ::alloc::boxed::Box;
+
                 let boxed_any: &Box<dyn Any $(+ $bounds)*> = self
                     .0
                     .entry(TypeId::of::<T>())
@@ -391,8 +288,11 @@ macro_rules! impl_erased_set {
             #[must_use]
             pub fn get_mut<T>(&mut self) -> Option<&mut T>
             where
-                T: Any $(+ $bounds)*,
+                T: ::core::any::Any $(+ $bounds)*,
             {
+                use ::core::any::{Any, TypeId};
+                use ::alloc::boxed::Box;
+
                 self.0
                     .get_mut(&TypeId::of::<T>())
                     .map(|boxed_any: &mut Box<dyn Any $(+ $bounds)*>| {
@@ -420,8 +320,11 @@ macro_rules! impl_erased_set {
             /// ```
             pub fn insert<T>(&mut self, value: T) -> Option<T>
             where
-                T: Any $(+ $bounds)*,
+                T: ::core::any::Any $(+ $bounds)*,
             {
+                use ::core::any::{Any, TypeId};
+                use ::alloc::boxed::Box;
+
                 self.0
                     .insert(TypeId::of::<T>(), Box::new(value))
                     .map(|boxed_any: Box<dyn Any $(+ $bounds)*>| {
@@ -449,8 +352,11 @@ macro_rules! impl_erased_set {
             /// ```
             pub fn remove<T>(&mut self) -> Option<T>
             where
-                T: Any $(+ $bounds)*,
+                T: ::core::any::Any $(+ $bounds)*,
             {
+                use ::core::any::{Any, TypeId};
+                use ::alloc::boxed::Box;
+
                 self.0
                     .remove(&TypeId::of::<T>())
                     .map(|boxed_any: Box<dyn Any $(+ $bounds)*>| {

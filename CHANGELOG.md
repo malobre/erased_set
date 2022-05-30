@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- `ErasedSet::with_capacity`
+- `ErasedSet::capacity`
+- `ErasedSet::reserve`
+- `ErasedSet::shrink_to`
+- `ErasedSet::shrink_to_fit`
+- `hashbrown` feature (`no_std` is still supported)
+
 ## [0.6.1] - 2022-05-28
 
 ### Added
