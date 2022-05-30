@@ -9,7 +9,7 @@ repository = "https://github.com/malobre/erased_set"
 categories = ["no-std", "data-structures"]
 readme = "README.md"
 keywords = ["anymap", "typemap", "map", "set"]
-include = ["/src/", "Cargo.toml", "LICENSE"]
+include = ["/src/", "/Cargo.toml", "/LICENSE"]
 
 [[bench]]
 name = "iai"
