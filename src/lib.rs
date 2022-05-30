@@ -376,6 +376,29 @@ impl_erased_set! {
     /// A set of erased types.
     ///
     /// This set can store a single instance of any type that implements [`Any`](::core::any::Any).
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// # #[derive(Debug, PartialEq)]
+    /// # struct ClickEvent(u32, u32);
+    /// # #[derive(Debug, PartialEq)]
+    /// # struct KeyDownEvent(char);
+    /// #
+    /// use erased_set::ErasedSet;
+    ///
+    /// let mut set = ErasedSet::new();
+    /// set.insert(ClickEvent(128, 256));
+    /// set.insert(KeyDownEvent('z'));
+    ///
+    /// assert_eq!(set.get::<ClickEvent>(), Some(&ClickEvent(128, 256)));
+    ///
+    /// assert_eq!(set.insert(KeyDownEvent('e')), Some(KeyDownEvent('z')));
+    ///
+    /// set.remove::<ClickEvent>();
+    ///
+    /// assert_eq!(set.len(), 1);
+    /// ```
     #[derive(Debug, Default)]
     pub struct ErasedSet: Any;
 }
@@ -383,6 +406,29 @@ impl_erased_set! {
 #[cfg(feature = "send")]
 impl_erased_set! {
     /// Like [`ErasedSet`] but with a [`Send`] bound.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// # #[derive(Debug, PartialEq)]
+    /// # struct ClickEvent(u32, u32);
+    /// # #[derive(Debug, PartialEq)]
+    /// # struct KeyDownEvent(char);
+    /// #
+    /// use erased_set::ErasedSendSet;
+    ///
+    /// let mut set = ErasedSendSet::new();
+    /// set.insert(ClickEvent(128, 256));
+    /// set.insert(KeyDownEvent('z'));
+    ///
+    /// assert_eq!(set.get::<ClickEvent>(), Some(&ClickEvent(128, 256)));
+    ///
+    /// assert_eq!(set.insert(KeyDownEvent('e')), Some(KeyDownEvent('z')));
+    ///
+    /// set.remove::<ClickEvent>();
+    ///
+    /// assert_eq!(set.len(), 1);
+    /// ```
     #[derive(Debug, Default)]
     pub struct ErasedSendSet: Any + Send;
 }
@@ -390,6 +436,29 @@ impl_erased_set! {
 #[cfg(feature = "sync")]
 impl_erased_set! {
     /// Like [`ErasedSet`] but with a [`Send`] + [`Sync`] bound.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// # #[derive(Debug, PartialEq)]
+    /// # struct ClickEvent(u32, u32);
+    /// # #[derive(Debug, PartialEq)]
+    /// # struct KeyDownEvent(char);
+    /// #
+    /// use erased_set::ErasedSyncSet;
+    ///
+    /// let mut set = ErasedSyncSet::new();
+    /// set.insert(ClickEvent(128, 256));
+    /// set.insert(KeyDownEvent('z'));
+    ///
+    /// assert_eq!(set.get::<ClickEvent>(), Some(&ClickEvent(128, 256)));
+    ///
+    /// assert_eq!(set.insert(KeyDownEvent('e')), Some(KeyDownEvent('z')));
+    ///
+    /// set.remove::<ClickEvent>();
+    ///
+    /// assert_eq!(set.len(), 1);
+    /// ```
     #[derive(Debug, Default)]
     pub struct ErasedSyncSet: Any + Send + Sync;
 }
