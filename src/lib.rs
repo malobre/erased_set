@@ -7,9 +7,10 @@
 //!
 //! ---
 //!
-//! This crate provides a new collection: The [`ErasedSet`].
+//! This crate provides a new collection: the [`ErasedSet`].
+//! It allows storing different types in a single set (as long as they implement [`Any`]).
 //!
-//! It can store any type `T: Any`.
+//! [`Any`]: ::core::any::Any
 //!
 //! ## Example
 //!
