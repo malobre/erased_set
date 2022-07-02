@@ -77,19 +77,19 @@ macro_rules! impl_erased_set {
         $vis:vis struct $name:ident: Any $(+ $bounds:tt)*;
     ) => {
         $(#[$attr])*
-        $vis struct $name(
+        $vis struct $name {
             #[doc(hidden)]
-            ::alloc::collections::BTreeMap<
+            inner: ::alloc::collections::BTreeMap<
                 ::core::any::TypeId,
                 ::alloc::boxed::Box<dyn ::core::any::Any $(+ $bounds)*>,
             >,
             #[doc(hidden)]
             #[cfg(debug_assertions)]
-            ::alloc::collections::BTreeMap<
+            debug_type_names: ::alloc::collections::BTreeMap<
                 ::core::any::TypeId,
                 &'static str
             >,
-        );
+        }
 
         #[allow(rustdoc::private_doc_tests)]
         impl $name {
@@ -107,11 +107,11 @@ macro_rules! impl_erased_set {
             /// ```
             #[must_use]
             pub fn new() -> Self {
-                Self(
-                    ::alloc::collections::BTreeMap::new(),
+                Self {
+                    inner: ::alloc::collections::BTreeMap::new(),
                     #[cfg(debug_assertions)]
-                    ::alloc::collections::BTreeMap::new(),
-                )
+                    debug_type_names: ::alloc::collections::BTreeMap::new(),
+                }
             }
 
             /// Returns `true` if the set contains no instances of any type.
@@ -126,7 +126,7 @@ macro_rules! impl_erased_set {
             /// ```
             #[must_use]
             pub fn is_empty(&self) -> bool {
-                self.0.is_empty()
+                self.inner.is_empty()
             }
 
             /// Returns the number of types in the set.
@@ -143,7 +143,7 @@ macro_rules! impl_erased_set {
             /// ```
             #[must_use]
             pub fn len(&self) -> usize {
-                self.0.len()
+                self.inner.len()
             }
 
             /// Clears the set. Keep allocated memory for reuse.
@@ -159,7 +159,7 @@ macro_rules! impl_erased_set {
             /// assert!(set.is_empty());
             /// ```
             pub fn clear(&mut self) {
-                self.0.clear();
+                self.inner.clear();
             }
 
             /// Returns `true` if the set contains an instance of `T`.
@@ -178,7 +178,7 @@ macro_rules! impl_erased_set {
             where
                 T: ::core::any::Any,
             {
-                self.0.contains_key(&::core::any::TypeId::of::<T>())
+                self.inner.contains_key(&::core::any::TypeId::of::<T>())
             }
 
             /// Returns a reference to an instance of `T`.
@@ -203,7 +203,7 @@ macro_rules! impl_erased_set {
                 use ::core::any::{Any, TypeId};
                 use ::alloc::boxed::Box;
 
-                self.0
+                self.inner
                     .get(&TypeId::of::<T>())
                     .map(|boxed_any: &Box<dyn Any $(+ $bounds)*>| {
                         // Sanity check
@@ -235,10 +235,10 @@ macro_rules! impl_erased_set {
                 use ::alloc::boxed::Box;
 
                 #[cfg(debug_assertions)]
-                self.1.insert(TypeId::of::<T>(), core::any::type_name::<T>());
+                self.debug_type_names.insert(TypeId::of::<T>(), core::any::type_name::<T>());
 
                 let boxed_any: &Box<dyn Any $(+ $bounds)*> = self
-                    .0
+                    .inner
                     .entry(TypeId::of::<T>())
                     .or_insert_with(|| Box::new(value));
 
@@ -270,10 +270,10 @@ macro_rules! impl_erased_set {
                 use ::alloc::boxed::Box;
 
                 #[cfg(debug_assertions)]
-                self.1.insert(TypeId::of::<T>(), core::any::type_name::<T>());
+                self.debug_type_names.insert(TypeId::of::<T>(), core::any::type_name::<T>());
 
                 let boxed_any: &Box<dyn Any $(+ $bounds)*> = self
-                    .0
+                    .inner
                     .entry(TypeId::of::<T>())
                     .or_insert_with(|| Box::new(f()));
 
@@ -309,7 +309,7 @@ macro_rules! impl_erased_set {
                 use ::core::any::{Any, TypeId};
                 use ::alloc::boxed::Box;
 
-                self.0
+                self.inner
                     .get_mut(&TypeId::of::<T>())
                     .map(|boxed_any: &mut Box<dyn Any $(+ $bounds)*>| {
                         // Sanity check
@@ -342,9 +342,9 @@ macro_rules! impl_erased_set {
                 use ::alloc::boxed::Box;
 
                 #[cfg(debug_assertions)]
-                self.1.insert(TypeId::of::<T>(), core::any::type_name::<T>());
+                self.debug_type_names.insert(TypeId::of::<T>(), core::any::type_name::<T>());
 
-                self.0
+                self.inner
                     .insert(TypeId::of::<T>(), Box::new(value))
                     .map(|boxed_any: Box<dyn Any $(+ $bounds)*>| {
                         // Sanity check
@@ -377,9 +377,9 @@ macro_rules! impl_erased_set {
                 use ::alloc::boxed::Box;
 
                 #[cfg(debug_assertions)]
-                self.1.remove(&TypeId::of::<T>());
+                self.debug_type_names.remove(&TypeId::of::<T>());
 
-                self.0
+                self.inner
                     .remove(&TypeId::of::<T>())
                     .map(|boxed_any: Box<dyn Any $(+ $bounds)*>| {
                         // Sanity check
@@ -398,13 +398,17 @@ macro_rules! impl_debug {
     ($ident:ident) => {
         impl ::core::fmt::Debug for $ident {
             fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-                // Print types ids.
-                #[cfg(not(debug_assertions))]
-                return f.debug_set().entries(self.0.keys()).finish();
 
-                // Print type names.
+                // Print type names if available.
                 #[cfg(debug_assertions)]
-                return f.debug_set().entries(self.1.values()).finish();
+                return f
+                    .debug_set()
+                    .entries(self.debug_type_names.values())
+                    .finish();
+
+                // Otherwise print types ids.
+                #[cfg(not(debug_assertions))]
+                return f.debug_set().entries(self.inner.keys()).finish();
             }
         }
     };
