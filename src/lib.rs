@@ -81,7 +81,13 @@ macro_rules! impl_erased_set {
             #[doc(hidden)]
             ::alloc::collections::BTreeMap<
                 ::core::any::TypeId,
-                ::alloc::boxed::Box<dyn ::core::any::Any $(+ $bounds)*>
+                ::alloc::boxed::Box<dyn ::core::any::Any $(+ $bounds)*>,
+            >,
+            #[doc(hidden)]
+            #[cfg(debug_assertions)]
+            ::alloc::collections::BTreeMap<
+                ::core::any::TypeId,
+                &'static str
             >,
         );
 
@@ -101,7 +107,11 @@ macro_rules! impl_erased_set {
             /// ```
             #[must_use]
             pub fn new() -> Self {
-                Self(::alloc::collections::BTreeMap::new())
+                Self(
+                    ::alloc::collections::BTreeMap::new(),
+                    #[cfg(debug_assertions)]
+                    ::alloc::collections::BTreeMap::new(),
+                )
             }
 
             /// Returns `true` if the set contains no instances of any type.
@@ -224,6 +234,9 @@ macro_rules! impl_erased_set {
                 use ::core::any::{Any, TypeId};
                 use ::alloc::boxed::Box;
 
+                #[cfg(debug_assertions)]
+                self.1.insert(TypeId::of::<T>(), core::any::type_name::<T>());
+
                 let boxed_any: &Box<dyn Any $(+ $bounds)*> = self
                     .0
                     .entry(TypeId::of::<T>())
@@ -255,6 +268,9 @@ macro_rules! impl_erased_set {
             {
                 use ::core::any::{Any, TypeId};
                 use ::alloc::boxed::Box;
+
+                #[cfg(debug_assertions)]
+                self.1.insert(TypeId::of::<T>(), core::any::type_name::<T>());
 
                 let boxed_any: &Box<dyn Any $(+ $bounds)*> = self
                     .0
@@ -325,6 +341,9 @@ macro_rules! impl_erased_set {
                 use ::core::any::{Any, TypeId};
                 use ::alloc::boxed::Box;
 
+                #[cfg(debug_assertions)]
+                self.1.insert(TypeId::of::<T>(), core::any::type_name::<T>());
+
                 self.0
                     .insert(TypeId::of::<T>(), Box::new(value))
                     .map(|boxed_any: Box<dyn Any $(+ $bounds)*>| {
@@ -357,6 +376,9 @@ macro_rules! impl_erased_set {
                 use ::core::any::{Any, TypeId};
                 use ::alloc::boxed::Box;
 
+                #[cfg(debug_assertions)]
+                self.1.remove(&TypeId::of::<T>());
+
                 self.0
                     .remove(&TypeId::of::<T>())
                     .map(|boxed_any: Box<dyn Any $(+ $bounds)*>| {
@@ -370,6 +392,22 @@ macro_rules! impl_erased_set {
             }
         }
     }
+}
+
+macro_rules! impl_debug {
+    ($ident:ident) => {
+        impl ::core::fmt::Debug for $ident {
+            fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+                // Print types ids.
+                #[cfg(not(debug_assertions))]
+                return f.debug_set().entries(self.0.keys()).finish();
+
+                // Print type names.
+                #[cfg(debug_assertions)]
+                return f.debug_set().entries(self.1.values()).finish();
+            }
+        }
+    };
 }
 
 impl_erased_set! {
@@ -399,7 +437,7 @@ impl_erased_set! {
     ///
     /// assert_eq!(set.len(), 1);
     /// ```
-    #[derive(Debug, Default)]
+    #[derive(Default)]
     pub struct ErasedSet: Any;
 }
 
@@ -429,7 +467,7 @@ impl_erased_set! {
     ///
     /// assert_eq!(set.len(), 1);
     /// ```
-    #[derive(Debug, Default)]
+    #[derive(Default)]
     pub struct ErasedSendSet: Any + Send;
 }
 
@@ -459,6 +497,14 @@ impl_erased_set! {
     ///
     /// assert_eq!(set.len(), 1);
     /// ```
-    #[derive(Debug, Default)]
+    #[derive(Default)]
     pub struct ErasedSyncSet: Any + Send + Sync;
 }
+
+impl_debug!(ErasedSet);
+
+#[cfg(feature = "send")]
+impl_debug!(ErasedSendSet);
+
+#[cfg(feature = "sync")]
+impl_debug!(ErasedSyncSet);
