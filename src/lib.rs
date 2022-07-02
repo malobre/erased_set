@@ -390,6 +390,12 @@ macro_rules! impl_erased_set {
                         unsafe { *Box::from_raw(ptr) }
                     })
             }
+
+            /// Returns an iterator over the names of the stored types.
+            #[cfg(debug_assertions)]
+            pub fn debug_types(&self) -> impl Iterator<Item = &'static str> + '_ {
+                self.debug_type_names.values().map(|&name: &&'static str| name)
+            }
         }
     }
 }
@@ -402,10 +408,7 @@ macro_rules! impl_debug {
 
                 // Print type names if available.
                 #[cfg(debug_assertions)]
-                return f
-                    .debug_set()
-                    .entries(self.debug_type_names.values())
-                    .finish();
+                return f.debug_set().entries(self.debug_types()).finish();
 
                 // Otherwise print types ids.
                 #[cfg(not(debug_assertions))]
