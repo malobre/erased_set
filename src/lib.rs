@@ -398,6 +398,7 @@ macro_rules! impl_debug {
     ($ident:ident) => {
         impl ::core::fmt::Debug for $ident {
             fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+                debug_assert!(self.inner.keys().eq(self.debug_type_names.keys()));
 
                 // Print type names if available.
                 #[cfg(debug_assertions)]
