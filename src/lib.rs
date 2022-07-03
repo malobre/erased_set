@@ -396,9 +396,9 @@ macro_rules! impl_erased_set {
                 self.inner.keys()
             }
 
-            /// Returns an iterator over the names of the stored types.
+            /// Gets an iterator over the names of the stored types.
             #[cfg(debug_assertions)]
-            pub fn debug_types(&self) -> impl Iterator<Item = &'static str> + '_ {
+            pub fn debug_type_names(&self) -> impl Iterator<Item = &'static str> + '_ {
                 assert!(self.inner.keys().eq(self.debug_type_names.keys()));
 
                 self.debug_type_names.values().map(|&name: &&'static str| name)
@@ -413,7 +413,7 @@ macro_rules! impl_debug {
             fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
                 // Print type names if available.
                 #[cfg(debug_assertions)]
-                return f.debug_set().entries(self.debug_types()).finish();
+                return f.debug_set().entries(self.debug_type_names()).finish();
 
                 // Otherwise print types ids.
                 #[cfg(not(debug_assertions))]
