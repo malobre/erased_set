@@ -407,22 +407,6 @@ macro_rules! impl_erased_set {
     }
 }
 
-macro_rules! impl_debug {
-    ($ident:ident) => {
-        impl ::core::fmt::Debug for $ident {
-            fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-                // Print type names if available.
-                #[cfg(debug_assertions)]
-                return f.debug_set().entries(self.debug_type_names()).finish();
-
-                // Otherwise print types ids.
-                #[cfg(not(debug_assertions))]
-                return f.debug_set().entries(self.type_ids()).finish();
-            }
-        }
-    };
-}
-
 impl_erased_set! {
     /// A set of erased types.
     ///
@@ -452,6 +436,16 @@ impl_erased_set! {
     /// ```
     #[derive(Default)]
     pub struct ErasedSet: Any;
+}
+
+impl core::fmt::Debug for ErasedSet {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        #[cfg(debug_assertions)]
+        return f.debug_set().entries(self.debug_type_names()).finish();
+
+        #[cfg(not(debug_assertions))]
+        return f.debug_set().entries(self.type_ids()).finish();
+    }
 }
 
 #[cfg(feature = "send")]
@@ -484,6 +478,17 @@ impl_erased_set! {
     pub struct ErasedSendSet: Any + Send;
 }
 
+#[cfg(feature = "send")]
+impl core::fmt::Debug for ErasedSendSet {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        #[cfg(debug_assertions)]
+        return f.debug_set().entries(self.debug_type_names()).finish();
+
+        #[cfg(not(debug_assertions))]
+        return f.debug_set().entries(self.type_ids()).finish();
+    }
+}
+
 #[cfg(feature = "sync")]
 impl_erased_set! {
     /// Like [`ErasedSet`] but with a [`Send`] + [`Sync`] bound.
@@ -514,10 +519,13 @@ impl_erased_set! {
     pub struct ErasedSyncSet: Any + Send + Sync;
 }
 
-impl_debug!(ErasedSet);
-
-#[cfg(feature = "send")]
-impl_debug!(ErasedSendSet);
-
 #[cfg(feature = "sync")]
-impl_debug!(ErasedSyncSet);
+impl core::fmt::Debug for ErasedSyncSet {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        #[cfg(debug_assertions)]
+        return f.debug_set().entries(self.debug_type_names()).finish();
+
+        #[cfg(not(debug_assertions))]
+        return f.debug_set().entries(self.type_ids()).finish();
+    }
+}
