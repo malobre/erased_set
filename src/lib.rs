@@ -399,6 +399,8 @@ macro_rules! impl_erased_set {
             /// Returns an iterator over the names of the stored types.
             #[cfg(debug_assertions)]
             pub fn debug_types(&self) -> impl Iterator<Item = &'static str> + '_ {
+                assert!(self.inner.keys().eq(self.debug_type_names.keys()));
+
                 self.debug_type_names.values().map(|&name: &&'static str| name)
             }
         }
@@ -409,8 +411,6 @@ macro_rules! impl_debug {
     ($ident:ident) => {
         impl ::core::fmt::Debug for $ident {
             fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-                debug_assert!(self.inner.keys().eq(self.debug_type_names.keys()));
-
                 // Print type names if available.
                 #[cfg(debug_assertions)]
                 return f.debug_set().entries(self.debug_types()).finish();
