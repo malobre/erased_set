@@ -54,7 +54,7 @@ extern crate alloc;
 ///
 /// # Syntax
 ///
-/// ```ignore
+/// ```rust,ignore
 /// impl_erased_set! {
 ///     [pub] struct NAME: Any [+ BOUNDS ...];
 /// }
@@ -62,7 +62,7 @@ extern crate alloc;
 ///
 /// # Example
 ///
-/// ```rust
+/// ```rust,ignore
 /// erased_set::impl_erased_set! {
 ///     /// A set of erased types.
 ///     #[derive(Debug, Default)]
