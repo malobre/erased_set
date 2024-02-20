@@ -440,11 +440,14 @@ impl_erased_set! {
 
 impl core::fmt::Debug for ErasedSet {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        #[cfg(debug_assertions)]
-        return f.debug_set().entries(self.debug_type_names()).finish();
-
-        #[cfg(not(debug_assertions))]
-        return f.debug_set().entries(self.type_ids()).finish();
+        f.debug_set()
+            .entries(
+                #[cfg(debug_assertions)]
+                self.debug_type_names(),
+                #[cfg(not(debug_assertions))]
+                self.type_ids(),
+            )
+            .finish()
     }
 }
 
@@ -481,11 +484,14 @@ impl_erased_set! {
 #[cfg(feature = "send")]
 impl core::fmt::Debug for ErasedSendSet {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        #[cfg(debug_assertions)]
-        return f.debug_set().entries(self.debug_type_names()).finish();
-
-        #[cfg(not(debug_assertions))]
-        return f.debug_set().entries(self.type_ids()).finish();
+        f.debug_set()
+            .entries(
+                #[cfg(debug_assertions)]
+                self.debug_type_names(),
+                #[cfg(not(debug_assertions))]
+                self.type_ids(),
+            )
+            .finish()
     }
 }
 
@@ -522,10 +528,13 @@ impl_erased_set! {
 #[cfg(feature = "sync")]
 impl core::fmt::Debug for ErasedSyncSet {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        #[cfg(debug_assertions)]
-        return f.debug_set().entries(self.debug_type_names()).finish();
-
-        #[cfg(not(debug_assertions))]
-        return f.debug_set().entries(self.type_ids()).finish();
+        f.debug_set()
+            .entries(
+                #[cfg(debug_assertions)]
+                self.debug_type_names(),
+                #[cfg(not(debug_assertions))]
+                self.type_ids(),
+            )
+            .finish()
     }
 }
