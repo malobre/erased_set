@@ -7,6 +7,10 @@ This project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- MSRV changed from unspecified to 1.60
+
 ### Fixed
 
 - Remove `must_use` attribute on `ErasedSet::get_or_insert` and
