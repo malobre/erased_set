@@ -12,8 +12,8 @@ keywords = ["anymap", "typemap", "map", "set"]
 include = ["/src/", "/Cargo.toml", "/LICENSE"]
 
 [[bench]]
-name = "iai"
-path = "benches/iai.rs"
+name = "calliper"
+path = "benches/calliper.rs"
 harness = false
 
 [[bench]]
@@ -27,5 +27,5 @@ send = []
 sync = []
 
 [dev-dependencies]
+calliper = "0.1.4"
 criterion = "0.3.5"
-iai = "0.1.1"

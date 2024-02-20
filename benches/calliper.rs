@@ -1,6 +1,8 @@
+use calliper::{utils::black_box, Runner, Scenario, ScenarioConfig};
 use erased_set::ErasedSet;
-use iai::black_box;
 
+#[no_mangle]
+#[inline(never)]
 fn insert_1() {
     let mut set = ErasedSet::new();
 
@@ -10,6 +12,8 @@ fn insert_1() {
     black_box(set);
 }
 
+#[no_mangle]
+#[inline(never)]
 fn insert_10() {
     let mut set = ErasedSet::new();
 
@@ -21,6 +25,8 @@ fn insert_10() {
     black_box(set);
 }
 
+#[no_mangle]
+#[inline(never)]
 fn insert_100() {
     let mut set = ErasedSet::new();
 
@@ -32,6 +38,8 @@ fn insert_100() {
     black_box(set);
 }
 
+#[no_mangle]
+#[inline(never)]
 fn get_1() {
     let mut set = ErasedSet::new();
 
@@ -40,6 +48,8 @@ fn get_1() {
     black_box(set.get::<A>());
 }
 
+#[no_mangle]
+#[inline(never)]
 fn get_10() {
     let mut set = ErasedSet::new();
 
@@ -50,6 +60,8 @@ fn get_10() {
     }
 }
 
+#[no_mangle]
+#[inline(never)]
 fn get_100() {
     let mut set = ErasedSet::new();
 
@@ -60,11 +72,24 @@ fn get_100() {
     }
 }
 
-iai::main! {
-    insert_1,
-    insert_10,
-    insert_100,
-    get_1,
-    get_10,
-    get_100
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let benches = [
+        Scenario::new(insert_1),
+        Scenario::new(insert_10),
+        Scenario::new(insert_100),
+        Scenario::new(get_1),
+        Scenario::new(get_10),
+        Scenario::new(get_100),
+    ];
+
+    let runner =
+        Runner::default().config(ScenarioConfig::default().branch_sim(true).collect_bus(true));
+
+    if let Some(results) = runner.run(&benches)? {
+        for res in results.into_iter() {
+            println!("{}", res.parse());
+        }
+    }
+
+    Ok(())
 }
