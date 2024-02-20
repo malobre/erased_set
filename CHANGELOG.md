@@ -7,6 +7,14 @@ This project adheres to
 
 ## [Unreleased]
 
+## [0.8.0] - 2024-02-20
+
+### Added
+
+- `ErasedSet::type_ids`
+- `ErasedSet::debug_type_names`, disabled in release mode,
+  return an iterator over the names of the stored types.
+
 ### Changed
 
 - MSRV changed from unspecified to 1.60
@@ -56,7 +64,8 @@ This project adheres to
 
 - `Debug` implementations.
 
-[unreleased]: https://github.com/malobre/erased_set/compare/v0.7.0...HEAD
+[unreleased]: https://github.com/malobre/erased_set/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/malobre/erased_set/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/malobre/erased_set/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/malobre/erased_set/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/malobre/erased_set/compare/v0.5.1...v0.6.0
