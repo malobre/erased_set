@@ -91,7 +91,6 @@ macro_rules! impl_erased_set {
             >,
         }
 
-        #[allow(rustdoc::private_doc_tests)]
         impl $name {
             #[doc = concat!("Creates an empty [`", stringify!($name), "`].")]
             ///
