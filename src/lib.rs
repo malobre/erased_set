@@ -391,12 +391,12 @@ macro_rules! impl_erased_set {
                     })
             }
 
-            /// Gets an iterator over the [`TypeId`](::core::any::TypeId)s of stored elements.
+            /// Gets an iterator over the [`TypeId`](::core::any::TypeId)s of stored elements, in arbitrary order.
             pub fn type_ids(&self) -> impl Iterator<Item = &::core::any::TypeId> {
                 self.inner.keys()
             }
 
-            /// Gets an iterator over the names of the stored types.
+            /// Gets an iterator over the names of the stored types, in arbitrary order.
             #[cfg(debug_assertions)]
             pub fn debug_type_names(&self) -> impl Iterator<Item = &'static str> + '_ {
                 assert!(self.inner.keys().eq(self.debug_type_names.keys()));
