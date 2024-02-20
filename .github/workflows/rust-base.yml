@@ -8,23 +8,42 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  VALGRIND_VERSION: 3.22.0
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Clone valgrind
+      run: git clone https://sourceware.org/git/valgrind.git --depth=1 --branch=VALGRIND_3_22_0
+
+    - name: Cache valgrind
+      id: cache-valgrind
+      uses: actions/cache@v4
+      with:
+        path: ./valgrind
+        key: ${{ runner.os }}-valgrind-${{ hashFiles('./valgrind/**/*', '!./valgrind/.git') }}
+
+    - name: Configure valgrind
+      if: steps.cache-valgrind.outputs.cache-hit != 'true'
+      working-directory: ./valgrind
+      run: |
+        ./autogen.sh
+        ./configure
+
+    - name: Build valgrind
+      working-directory: ./valgrind
+      run: make
 
     - name: Install valgrind
-      run: |
-        pushd $(mktemp --directory)
-        curl --silent https://sourceware.org/pub/valgrind/valgrind-3.22.0.tar.bz2 | tar --extract --bzip2 --verbose --file=-
-        cd valgrind-3.22.0
-        ./configure
-        make
-        sudo make install
-        popd
+      working-directory: ./valgrind
+      run: sudo make install
+
+    - name: Cleanup
+      run: rm --recursive --force valgrind
+
+    - uses: actions/checkout@v4
 
     - name: Build without default features
       run: cargo build --no-default-features
