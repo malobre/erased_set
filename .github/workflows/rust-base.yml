@@ -16,6 +16,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install valgrind
+      run: |
+        pushd $(mktemp --directory)
+        curl --silent https://sourceware.org/pub/valgrind/valgrind-3.22.0.tar.bz2 | tar --extract --bzip2 --verbose --file=-
+        cd valgrind-3.22.0
+        ./configure
+        make
+        sudo make install
+        popd
+
     - name: Build without default features
       run: cargo build --no-default-features
 
